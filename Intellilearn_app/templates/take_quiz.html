@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taking Quiz: {{ content.title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-body: #f8fafc; --bg-card: #ffffff; --primary-dark: #0f172a; --primary-blue: #2563EB;
+            --border-color: #e2e8f0; --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            
+            /* RESULT COLORS (IMPORTANT) */
+            --success-bg: #dcfce7; --success-border: #86efac; --success-text: #166534;
+            --danger-bg: #fee2e2; --danger-border: #fca5a5; --danger-text: #991b1b;
+        }
+        body { background: var(--bg-body); font-family: 'Inter', sans-serif; display: flex; justify-content: center; padding: 40px; }
+        
+        .quiz-container { background: white; width: 100%; max-width: 800px; padding: 40px; border-radius: 16px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); }
+        h2 { color: var(--primary-dark); margin-bottom: 10px; font-size: 24px; }
+        p.subtitle { color: #64748b; margin-bottom: 30px; font-size: 14px; }
+
+        .score-banner { background: #f0f9ff; border: 1px solid #bfdbfe; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 30px; }
+        .score-banner h3 { color: var(--primary-blue); margin: 0 0 5px 0; font-size: 28px; }
+        .score-banner p { color: #64748b; margin: 0; font-size: 14px; }
+
+        .question-box { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #f1f5f9; }
+        .question-box:last-child { border-bottom: none; }
+        .question-text { font-weight: 600; font-size: 1.1rem; margin-bottom: 15px; color: #1e293b; }
+        
+        .option-label { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: 0.2s; background: white; }
+        .option-label:hover { background: #f8fafc; border-color: var(--primary-blue); }
+        input[type="radio"] { transform: scale(1.2); accent-color: var(--primary-blue); }
+
+        /* --- FIXED COLOR LOGIC --- */
+        /* Correct Answer = Always Green */
+        .option-label.correct-answer {
+            background-color: var(--success-bg) !important;
+            border-color: var(--success-border) !important;
+            color: var(--success-text) !important;
+            font-weight: 700;
+        }
+
+        /* User Wrong Selection = Red */
+        .option-label.wrong-answer {
+            background-color: var(--danger-bg) !important;
+            border-color: var(--danger-border) !important;
+            color: var(--danger-text) !important;
+            opacity: 0.9;
+        }
+
+        .btn-submit, .btn-back { background: var(--primary-blue); color: white; border: none; padding: 15px 30px; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; width: 100%; margin-top: 10px; text-align: center; display: block; text-decoration: none; }
+        .btn-submit:hover { background: #1d4ed8; }
+        .btn-back { background: #e2e8f0; color: var(--primary-dark); }
+        .btn-back:hover { background: #cbd5e1; }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <h2>📝 {{ content.title }}</h2>
+        <p class="subtitle">{% if show_results %}Results Overview{% else %}Answer carefully. Once submitted, your score will be recorded.{% endif %}</p>
+
+        {% if show_results %}
+        <div class="score-banner">
+            <h3>You Scored: {{ score }} / {{ total }}</h3>
+            <p>Green indicates the correct answer. Red indicates a wrong selection.</p>
+        </div>
+        {% endif %}
+
+        <form action="/submit_quiz_result/{{ content.id }}/" method="POST">
+            {% csrf_token %}
+            
+            {% for q in quiz_data %}
+            <div class="question-box">
+                <div class="question-text">{{ forloop.counter }}. {{ q.question }}</div>
+                
+                {% for option in q.options %}
+                    {% cycle 'A' 'B' 'C' 'D' as option_letter silent %}
+                    
+                    <label class="option-label
+                        {% if show_results %}
+                            {# 1. ALWAYS highlight the correct answer in GREEN #}
+                            {% if option_letter == q.answer %}
+                                correct-answer
+                            {# 2. ONLY highlight in RED if user picked it AND it is wrong #}
+                            {% elif option_letter == q.user_answer %}
+                                wrong-answer
+                            {% endif %}
+                        {% endif %}
+                    ">
+                        <input type="radio" 
+                               name="question_{{ forloop.parentloop.counter0 }}" 
+                               value="{{ option_letter }}"
+                               {% if show_results %}
+                                    disabled
+                                    {% if option_letter == q.user_answer %}checked{% endif %}
+                               {% endif %}
+                               required>
+                        {{ option }}
+                    </label>
+                {% endfor %}
+                {% resetcycle %}
+            </div>
+            {% endfor %}
+
+            {% if show_results %}
+                <a href="/studentquiz/" class="btn-back">Back to Quiz Library</a>
+            {% else %}
+                <button type="submit" class="btn-submit">Submit Assessment</button>
+            {% endif %}
+        </form>
+    </div>
+
+</body>
+</html>

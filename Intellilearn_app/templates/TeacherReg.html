@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntelliLearn - Teacher Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- VARIABLES --- */
+        :root {
+            --primary-dark: #0f172a;    /* Dark Navy */
+            --primary-blue: #1e40af;    /* Button Blue */
+            --accent-gold: #c29b40;     /* Teacher Gold */
+            --text-grey: #4b5563;
+            --bg-light: #f8fafc;
+            --white: #ffffff;
+            --max-width: 1200px;
+            --border-color: #e2e8f0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--primary-dark);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        
+        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 20px; }
+
+        /* --- HEADER --- */
+        header {
+            background: var(--white);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        nav { display: flex; justify-content: space-between; align-items: center; }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo i { color: var(--primary-blue); }
+
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+
+        /* General Button Styles */
+        .nav-links .btn { 
+            padding: 10px 25px; 
+            font-size: 0.9rem; 
+            color: var(--white); 
+            border-radius: 50px; 
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .btn-student { background-color: var(--primary-dark); }
+        
+        /* RESTORED: Teacher Button Background is GOLD */
+        .btn-teacher { background-color: var(--accent-gold); }
+
+        .nav-links .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            filter: brightness(1.1);
+        }
+
+        /* Active State */
+        .nav-links .btn.active {
+            font-weight: 700; 
+            transform: translateY(0);
+        }
+
+        /* --- REGISTRATION SECTION --- */
+        .register-section {
+            padding: 60px 0;
+            min-height: calc(100vh - 140px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .register-card {
+            background: var(--white);
+            width: 100%;
+            max-width: 800px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            padding: 40px;
+            border: 1px solid var(--border-color);
+        }
+
+        .register-header { text-align: center; margin-bottom: 40px; }
+        .register-header h1 { font-size: 2rem; color: var(--primary-dark); margin-bottom: 10px; }
+        .register-header p { color: var(--text-grey); }
+
+        /* --- FORM GRID SYSTEM --- */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Profile Upload */
+        .profile-row {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-circle {
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            background: var(--bg-light);
+            border: 2px dashed var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        /* Highlight: Kept Blue for hover as requested */
+        .profile-circle:hover { border-color: var(--primary-blue); background: #eff6ff; } 
+        
+        .profile-circle img {
+            width: 100%; height: 100%; object-fit: cover;
+            position: absolute; top: 0; left: 0; display: none;
+        }
+        .profile-circle i { font-size: 1.5rem; color: var(--text-grey); margin-bottom: 5px; }
+        .profile-circle span { font-size: 0.7rem; color: var(--text-grey); }
+        .profile-circle input { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+
+        /* Inputs */
+        .form-group { display: flex; flex-direction: column; }
+        .full-width { grid-column: 1 / -1; }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary-dark);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-light);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            color: var(--primary-dark);
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        /* Highlight: Kept Blue for Focus (Active state) */
+        input:focus, select:focus {
+            border-color: var(--primary-blue);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 1rem center;
+            background-repeat: no-repeat;
+            background-size: 1em;
+        }
+
+        /* Submit Button: RESTORED TO GOLD (The "Box" is Gold) */
+        .btn-register {
+            grid-column: 1 / -1;
+            width: 100%;
+            background-color: var(--accent-gold); /* GOLD BG */
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            background-color: #a37f30; /* Darker Gold Hover */
+            box-shadow: 0 5px 15px rgba(194, 155, 64, 0.3);
+        }
+
+        .terms {
+            grid-column: 1 / -1;
+            font-size: 0.85rem;
+            color: var(--text-grey);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .terms input { width: auto; margin-right: 5px; } 
+        
+        /* Terms Links: Kept Blue */
+        .terms a { color: var(--primary-blue); font-weight: 600; }
+
+        /* --- Sign In Option Style --- */
+        .signin-option {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--text-grey);
+        }
+        .signin-option a {
+            color: var(--primary-blue);
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .signin-option a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .form-grid { grid-template-columns: 1fr; }
+            .register-card { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="{% url 'index' %}" class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    IntelliLearn
+                </a>
+                <ul class="nav-links">
+                    
+                    <li>
+                        <a href="{% url 'register' %}" class="btn btn-student">
+                            Student Register
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a href="{% url 'TeacherReg' %}" class="btn btn-teacher active" style="box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.4);">
+                            Teacher Register
+                        </a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="register-section">
+        <div class="register-card">
+            <div class="register-header">
+                <h1>Create Teacher Account</h1>
+                <p>Join our community of educators and empower student learning.</p>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data" onsubmit="return showSuccessPopup()">
+                {% csrf_token %}
+                
+                <div class="form-grid">
+                    
+                    <div class="profile-row">
+                        <label class="profile-circle">
+                            <input type="file" name="image" accept="image/*" onchange="previewImage(event)">
+                            <img id="preview-img" src="#" alt="Preview">
+                            <i class="fas fa-camera"></i>
+                            <span>Upload</span>
+                        </label>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Full Name</label>
+                        <input type="text" name="name" placeholder="Your Name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Age</label>
+                        <input type="number" name="age" min="18" max="100" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select name="gender" required>
+                            <option value="" disabled selected>Select...</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="text" name="phone" placeholder="123-456-7890" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Experience</label>
+                        <input type="text" name="experience" placeholder="e.g. 5 Years" required>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Specialization</label>
+                        <input type="text" name="specialization" placeholder="e.g. Mathematics, Science" required>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Email Address</label>
+                        <input type="email" name="email" placeholder="name@example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" name="password" placeholder="••••••••" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" name="confirmpassword" placeholder="••••••••" required>
+                    </div>
+
+                    <div class="terms">
+                        <input type="checkbox" name="terms" required>
+                        <span>I agree to the <a href="#">Terms of Service</a> & <a href="#">Privacy Policy</a>.</span>
+                    </div>
+
+                    <button type="submit" class="btn-register">
+                        Join Us <i class="fas fa-arrow-right"></i>
+                    </button>
+
+                    <div class="signin-option">
+                        <p>Already have an account? <a href="{% url 'TeacherLogin' %}">Sign In</a></p>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <footer style="background-color: var(--primary-dark); color: white; padding: 20px 0; text-align: center;">
+        <div class="container">
+            <p style="font-size: 0.9rem; color: #cbd5e1;">&copy; 2025 IntelliLearn. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function(){
+                const output = document.getElementById('preview-img');
+                output.src = reader.result;
+                output.style.display = 'block';
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        // --- NEW: Function to show success popup ---
+        function showSuccessPopup() {
+            // Displays popup window (alert) before submitting the form
+            alert("User Registered Successfully!"); 
+            return true; // proceed with submission
+        }
+    </script>
+</body>
+</html>

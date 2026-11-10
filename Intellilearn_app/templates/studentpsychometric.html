@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Psychometric Test | IntelliLearn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #2563EB; --bg: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 40px; }
+        
+        .container {
+            background: white; width: 100%; max-width: 700px; padding: 40px;
+            border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        
+        h1 { color: #0f172a; font-size: 24px; margin-bottom: 8px; text-align: center; }
+        p.subtitle { color: #64748b; text-align: center; margin-bottom: 32px; font-size: 14px; }
+
+        .question-card {
+            margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .question-text { font-weight: 600; font-size: 16px; margin-bottom: 16px; color: #1e293b; }
+        
+        .options-grid { display: flex; flex-direction: column; gap: 10px; }
+        
+        label {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        
+        label:hover { border-color: var(--primary); background: #eff6ff; }
+        input[type="radio"] { accent-color: var(--primary); transform: scale(1.2); }
+
+        .submit-btn {
+            width: 100%; padding: 14px; background: var(--primary); color: white;
+            border: none; border-radius: 8px; font-size: 16px; font-weight: 600;
+            cursor: pointer; margin-top: 10px;
+        }
+        .submit-btn:hover { background: #1d4ed8; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Discover Your Learning Style 🧠</h1>
+        <p class="subtitle">Answer these 5 questions to unlock personalized AI recommendations.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            {% for q in questions %}
+            <div class="question-card">
+                <div class="question-text">{{ forloop.counter }}. {{ q.question }}</div>
+                <div class="options-grid">
+                    {% for opt in q.options %}
+                    <label>
+                        <input type="radio" name="{{ q.id }}" value="{{ opt.value }}" required>
+                        {{ opt.text }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="submit-btn">Analyze My Style</button>
+        </form>
+    </div>
+
+</body>
+</html>

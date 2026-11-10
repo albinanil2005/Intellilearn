@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntelliLearn - My Profile</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --primary-blue: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg-color: #f3f4f6;
+            --sidebar-width: 260px;
+            --text-dark: #1e293b;
+            --text-medium: #475569;
+            --text-light: #94a3b8;
+            --border-color: #e2e8f0;
+            --danger: #ef4444;
+            --card-bg: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body { background-color: var(--bg-color); color: var(--text-dark); height: 100vh; overflow: hidden; }
+
+        .container { display: flex; height: 100%; }
+
+        /* --- SIDEBAR --- */
+        .sidebar { width: var(--sidebar-width); background: #ffffff; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 1.5rem; flex-shrink: 0; }
+        .logo { font-size: 1.4rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 2.5rem; display: flex; align-items: center; gap: 10px; }
+        .sidebar nav ul { list-style: none; }
+        .sidebar nav ul li { margin-bottom: 0.5rem; }
+        .sidebar nav ul li a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; text-decoration: none; color: var(--text-medium); font-weight: 500; border-radius: 8px; transition: all 0.2s; }
+        .sidebar nav ul li.active a, .sidebar nav ul li a:hover { background-color: var(--primary-blue); color: white; }
+
+        /* Logout Container (Pushed to bottom) */
+        .logout-container { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color); }
+        .logout-link { display: flex; align-items: center; gap: 12px; padding: 12px 15px; text-decoration: none; color: var(--text-medium); font-weight: 500; border-radius: 8px; transition: all 0.2s; }
+        .logout-link:hover { background-color: #fef2f2; color: var(--danger) !important; }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { flex: 1; overflow-y: auto; padding: 2rem; display: flex; flex-direction: column; }
+
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .page-title h2 { font-size: 1.5rem; font-weight: 600; }
+        .user-profile-mini { display: flex; align-items: center; gap: 15px; }
+        .user-profile-mini img { width: 35px; height: 35px; border-radius: 50%; border: 1px solid #ddd; object-fit: cover; }
+
+        /* --- PROFILE VIEW LAYOUT --- */
+        .profile-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 1000px;
+        }
+
+        .profile-left { display: flex; flex-direction: column; align-items: center; border-right: 1px solid var(--border-color); padding-right: 30px; }
+        
+        .img-container {
+            width: 150px; height: 150px; border-radius: 50%;
+            border: 3px solid var(--border-color); overflow: hidden; margin-bottom: 20px;
+        }
+        .img-container img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Right Side */
+        .profile-details { padding-left: 10px; }
+        .form-header { margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+        .form-header h3 { font-size: 1.1rem; font-weight: 600; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .full-width { grid-column: 1 / -1; }
+
+        .form-group label { font-size: 0.85rem; font-weight: 600; color: var(--text-dark); }
+        
+        /* View Only Input Style */
+        .form-control {
+            padding: 10px 15px;
+            border: 1px solid transparent; /* No border for view mode looks cleaner, or use #e2e8f0 */
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: var(--text-medium);
+            background-color: #f8fafc;
+            outline: none;
+            pointer-events: none; /* Prevents clicking */
+        }
+
+        .btn-edit {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 30px;
+            float: right;
+        }
+        .btn-edit:hover { background-color: var(--primary-dark); }
+
+        /* --- Logout Modal Styles (Added) --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-box {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-box h2 {
+            margin-bottom: 12px;
+            font-size: 18px;
+            color: var(--text-dark);
+        }
+
+        .modal-box p {
+            margin-bottom: 20px;
+            color: var(--text-medium);
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .btn-modal {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-confirm {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .btn-cancel {
+            background: #e5e7eb;
+            color: var(--text-dark);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo"><i class="fa-solid fa-graduation-cap"></i> IntelliLearn</div>
+            <nav>
+                <ul>
+                    <li><a href="/teacherdashboard/"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
+                    <li><a href="/teacherclasses/"><i class="fa-regular fa-folder"></i> My Classes</a></li>
+                    <li><a href="/teachercontentupl/"><i class="fa-solid fa-upload"></i> Content Upload</a></li>
+                    <li><a href="/teachercontentlib/"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Content Library</a></li>
+                    <li><a href="/teacherstanaly/"><i class="fa-solid fa-chart-column"></i> Student Analytics</a></li>
+                    <li class="active"><a href="/teacherprofile/"><i class="fa-solid fa-user"></i> My Profile</a></li>
+                </ul>
+            </nav>
+      
+            <div class="logout-container">
+                <a href="/index/" class="logout-link"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <div class="page-title"><h2>My Profile</h2></div>
+                <div class="user-profile-mini">
+                    {% if user.image %}
+                        <img src="{{ user.image.url }}" alt="Profile">
+                    {% else %}
+                        <img src="https://ui-avatars.com/api/?name={{ user.name|default:'Teacher' }}&background=0D8ABC&color=fff" alt="Profile">
+                    {% endif %}
+                    <span style="font-size:0.9rem; font-weight:500;">{{ user.name|default:"Teacher" }}</span>
+                </div>
+            </header>
+
+            <div class="profile-layout">
+                <div class="profile-left">
+                    <div class="img-container">
+                        {% if user.image %}
+                            <img src="{{ user.image.url }}" alt="Profile Picture">
+                        {% else %}
+                            <img src="https://ui-avatars.com/api/?name={{ user.name|default:'Teacher' }}&background=0D8ABC&color=fff&size=200" alt="Profile Picture">
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="profile-details">
+                    <div class="form-header"><h3>Personal Information</h3></div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Full Name</label>
+                            <input type="text" class="form-control" value="{{ user.name }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="text" class="form-control" value="{{ user.email }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="text" class="form-control" value="{{ user.phone }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Age</label>
+                            <input type="text" class="form-control" value="{{ user.age }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <input type="text" class="form-control" value="{{ user.gender }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Experience</label>
+                            <input type="text" class="form-control" value="{{ user.experience }}" readonly>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Specialization</label>
+                            <input type="text" class="form-control" value="{{ user.specialization }}" readonly>
+                        </div>
+                    </div>
+
+                    <a href="/teachereditprofile/" class="btn-edit">
+                        <i class="fa-solid fa-pen-to-square"></i> Edit Profile
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="logout-modal">
+      <div class="modal-box">
+        <h2>Confirm Logout</h2>
+        <p>Are you sure you want to log out?</p>
+        <div class="modal-buttons">
+          <button class="btn-modal btn-confirm" id="confirm-logout">Yes</button>
+          <button class="btn-modal btn-cancel" id="cancel-logout">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const logoutLink = document.querySelector(".logout-link");
+      const modal = document.getElementById("logout-modal");
+      const confirmBtn = document.getElementById("confirm-logout");
+      const cancelBtn = document.getElementById("cancel-logout");
+
+      // Show popup when logout is clicked
+      logoutLink.addEventListener("click", function(event) {
+        event.preventDefault();
+        modal.style.display = "flex";
+      });
+
+      // Confirm logout
+      confirmBtn.addEventListener("click", function() {
+        window.location.href = logoutLink.getAttribute("href");
+      });
+
+      // Cancel logout
+      cancelBtn.addEventListener("click", function() {
+        modal.style.display = "none";
+      });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achievements - IntelliLearn</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- CSS VARIABLES (MATCHING LIGHT DASHBOARD THEME) --- */
+        :root {
+            /* Light Theme Colors */
+            --bg-body: #f8fafc;       /* Light Grey Background */
+            --bg-card: #ffffff;       /* White Card Background */
+            --bg-sidebar: #ffffff;    
+            
+            /* Brand Colors */
+            --primary-dark: #0f172a;  /* Dark Navy */
+            --primary-blue: #2563EB;  /* Royal Blue */
+            
+            /* Text Colors */
+            --text-main: #1f2937;     
+            --text-muted: #64748b;    
+            
+            /* Borders & Shadows */
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            
+            /* Status Colors */
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444; 
+            
+            /* Medal Colors */
+            --gold: #fbbf24;
+            --silver: #94a3b8;
+            --bronze: #b45309;
+            
+            --radius-lg: 16px;
+            --radius-md: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* --- SIDEBAR (MATCHING DASHBOARD) --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex; flex-direction: column; padding: 24px;
+            box-shadow: var(--shadow-sm); z-index: 10;
+        }
+
+        .logo-container { display: flex; align-items: center; margin-bottom: 40px; padding-left: 5px; }
+        .logo-text { font-size: 1.5rem; font-weight: 700; color: var(--primary-dark); display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo-text i { color: var(--primary-blue); }
+
+        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            color: var(--text-muted); text-decoration: none; border-radius: var(--radius-md);
+            transition: all 0.2s ease; font-weight: 500;
+        }
+        .nav-item:hover { background-color: #f1f5f9; color: var(--primary-blue); }
+        .nav-item.active { background-color: var(--primary-blue); color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); }
+
+        .logout-container { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color); }
+        .logout-container .nav-item:hover { background-color: #fef2f2; color: var(--danger) !important; }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; background-color: var(--bg-body); }
+
+        header {
+            height: 80px; border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 32px; background: var(--bg-card);
+        }
+
+        .profile-section { display: flex; align-items: center; gap: 12px; padding-left: 24px; border-left: 1px solid var(--border-color); }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background-color: #cbd5e1; overflow: hidden; border: 2px solid white; box-shadow: var(--shadow-sm); }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* --- ACHIEVEMENTS BODY --- */
+        .achievements-body {
+            padding: 32px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        /* LEVEL BANNER (Royal Blue Gradient) */
+        .level-banner {
+            background: linear-gradient(135deg, #1e40af, #2563EB);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: relative; overflow: hidden;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2);
+            color: white;
+        }
+
+        .level-banner::before {
+            content: ''; position: absolute; top: -50px; right: -50px; width: 200px; height: 200px;
+            background: rgba(255,255,255,0.1); border-radius: 50%;
+        }
+
+        .level-info h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+        .level-info p { font-size: 14px; opacity: 0.9; margin-bottom: 20px; color: #dbeafe; }
+
+        .xp-bar-container {
+            width: 400px; background: rgba(255,255,255,0.2); height: 12px; border-radius: 20px; position: relative;
+        }
+        
+        .xp-bar-fill {
+            /* Width set dynamically inline */
+            height: 100%; background: #fbbf24; border-radius: 20px; box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+        }
+
+        .xp-text {
+            font-size: 12px; font-weight: 600; margin-top: 8px; display: flex; justify-content: space-between; color: white;
+        }
+
+        .level-badge {
+            width: 100px; height: 100px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px;
+            border: 4px solid rgba(255,255,255,0.3); box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* MAIN GRID */
+        .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+
+        /* BADGE COLLECTION */
+        .section-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .section-title { font-size: 18px; font-weight: 600; color: var(--primary-dark); }
+
+        .badge-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 20px;
+        }
+
+        .badge-item {
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            transition: transform 0.2s; cursor: pointer;
+        }
+
+        .badge-item:hover { transform: translateY(-5px); }
+
+        .badge-icon {
+            width: 80px; height: 80px; background: #f1f5f9; border-radius: 20px;
+            display: flex; align-items: center; justify-content: center; font-size: 32px;
+            margin-bottom: 12px; position: relative; border: 2px solid transparent;
+        }
+
+        .badge-item.unlocked .badge-icon {
+            background: #eff6ff; border-color: var(--primary-blue);
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.15);
+        }
+
+        .badge-item.locked { opacity: 0.5; filter: grayscale(100%); }
+        
+        .badge-name { font-size: 12px; font-weight: 600; margin-bottom: 4px; color: var(--primary-dark); }
+        .badge-desc { font-size: 10px; color: var(--text-muted); }
+
+        /* LEADERBOARD */
+        .leaderboard-list { display: flex; flex-direction: column; gap: 12px; }
+
+        .lb-row {
+            display: flex; align-items: center; padding: 12px;
+            background: white; border-radius: 12px; border: 1px solid var(--border-color);
+        }
+
+        .lb-row.highlight {
+            background: #eff6ff; border-color: var(--primary-blue);
+        }
+
+        .lb-rank { width: 30px; font-weight: 700; font-size: 14px; color: var(--text-muted); }
+
+        .rank-1 { color: var(--gold); }
+        .rank-2 { color: #94a3b8; }
+        .rank-3 { color: var(--bronze); }
+
+        .lb-user { flex: 1; display: flex; align-items: center; gap: 10px; color: var(--primary-dark); font-weight: 500;}
+        .lb-avatar { width: 32px; height: 32px; border-radius: 50%; background: #e2e8f0; overflow:hidden; }
+        .lb-avatar img { width:100%; height:100%; object-fit:cover; }
+        
+        .lb-xp { font-weight: 600; font-size: 13px; color: var(--primary-blue); }
+
+        /* CERTIFICATES / QUIZ TABLE STYLES (ADDED) */
+        .cert-list { display: block; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px; color: var(--text-muted); font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--border-color); text-transform: uppercase; background: #f8fafc; }
+        td { padding: 12px; font-size: 14px; border-bottom: 1px solid var(--border-color); color: var(--text-main); }
+        tr:last-child td { border-bottom: none; }
+        .score-badge { padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 12px; }
+        .score-good { background: #dcfce7; color: var(--success); }
+        .score-bad { background: #fee2e2; color: var(--danger); }
+
+        /* Button Style for View Quiz */
+        .btn-view-quiz {
+            padding: 6px 12px; font-size: 11px; font-weight: 600;
+            color: var(--primary-blue); background: #eff6ff; border: 1px solid var(--primary-blue);
+            border-radius: 6px; text-decoration: none; display: inline-block; transition: 0.2s;
+        }
+        .btn-view-quiz:hover { background: var(--primary-blue); color: white; }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* --- Logout Modal Styles --- */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 2000;
+        }
+        .modal-box {
+            background: var(--bg-card); padding: 24px; border-radius: var(--radius-lg); width: 320px;
+            text-align: center; box-shadow: var(--shadow-md); animation: fadeIn 0.3s ease;
+        }
+        .modal-box h2 { margin-bottom: 12px; font-size: 18px; color: var(--primary-dark); }
+        .modal-box p { margin-bottom: 20px; color: var(--text-muted); }
+        .modal-buttons { display: flex; justify-content: space-around; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; }
+        .btn-confirm { background: var(--danger); color: #fff; }
+        .btn-cancel { background: #e5e7eb; color: var(--primary-dark); }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo-container">
+            <a href="#" class="logo-text">
+                <i class="fas fa-graduation-cap"></i>
+                IntelliLearn
+            </a>
+        </div>
+
+        <ul class="nav-menu">
+            <li><a href="/studentdashboard/" class="nav-item"><span>📊</span> Dashboard</a></li>
+            <li><a href="/studentcourses/" class="nav-item"><span>📚</span> My Courses</a></li>
+            <li><a href="/studentquiz/" class="nav-item"><span>📝</span> Quiz</a></li>
+            <li><a href="/studenttimetable/" class="nav-item"><span>📅</span> Timetable</a></li>
+            <li><a href="/studentachievements/" class="nav-item active"><span>🏆</span> Achievements</a></li>
+             <li><a href="/studentprofile/" class="nav-item">
+                <span>👤</span> My Profile
+            </a></li>
+        </ul>
+        
+        <div class="logout-container">
+            <a href="/index/" class="nav-item" style="color: var(--text-muted);"><span>🚪</span> Logout</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        
+        <header>
+            <h2 style="font-size: 20px; font-weight: 600; color: var(--primary-dark);">Achievements & Rewards</h2>
+            
+            <div class="profile-section">
+                <div style="text-align: right;">
+                    <div style="font-weight: 600; font-size: 14px; color: var(--primary-dark);">{{ user.name }}</div>
+                </div>
+                <div class="avatar">
+                    {% if user.image %}
+                        <img src="{{ user.image.url }}" alt="User">
+                    {% else %}
+                        <img src="https://ui-avatars.com/api/?name={{ user.name }}&background=2563EB&color=fff" alt="User">
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+
+        <div class="achievements-body">
+            
+            <div class="level-banner">
+                <div class="level-info">
+                    <p>CURRENT RANK</p>
+                    <h1>{{ rank }}</h1>
+                    <div class="xp-bar-container">
+                        <div class="xp-bar-fill" style="width: {{ progress }}%;"></div>
+                        <div class="xp-text">
+                            <span>{{ total_xp }} XP</span>
+                            <span>Next Level: {{ next_level }} XP</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="level-badge">
+                    🏆
+                </div>
+            </div>
+
+            <div class="content-grid">
+                
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">Earned Badges</div>
+                        <span style="font-size:12px; color:var(--text-muted);">Level up to unlock more!</span>
+                    </div>
+
+                    <div class="badge-grid">
+                        
+                        <div class="badge-item unlocked">
+                            <div class="badge-icon">🔥</div>
+                            <div class="badge-name">Week Streak</div>
+                            <div class="badge-desc">Welcome Gift</div>
+                        </div>
+
+                        <div class="badge-item {% if total_xp > 0 %}unlocked{% else %}locked{% endif %}">
+                            <div class="badge-icon">🧠</div>
+                            <div class="badge-name">Quiz Master</div>
+                            <div class="badge-desc">
+                                {% if total_xp > 0 %}First Quiz Taken{% else %}Start a Quiz{% endif %}
+                            </div>
+                        </div>
+
+                        <div class="badge-item {% if total_xp >= 500 %}unlocked{% else %}locked{% endif %}">
+                            <div class="badge-icon">📝</div>
+                            <div class="badge-name">Note Taker</div>
+                            <div class="badge-desc">
+                                {% if total_xp >= 500 %}Active Learner{% else %}Unlock at 500 XP{% endif %}
+                            </div>
+                        </div>
+
+                        <div class="badge-item {% if total_xp >= 2000 %}unlocked{% else %}locked{% endif %}">
+                            <div class="badge-icon">💻</div>
+                            <div class="badge-name">Coder</div>
+                            <div class="badge-desc">
+                                {% if total_xp >= 2000 %}Tech Whiz{% else %}Unlock at 2000 XP{% endif %}
+                            </div>
+                        </div>
+
+                        <div class="badge-item {% if total_xp >= 3500 %}unlocked{% else %}locked{% endif %}">
+                            <div class="badge-icon">⚡</div>
+                            <div class="badge-name">Speedster</div>
+                            <div class="badge-desc">
+                                {% if total_xp >= 3500 %}Fast Learner{% else %}Unlock at 3500 XP{% endif %}
+                            </div>
+                        </div>
+
+                        <div class="badge-item {% if total_xp >= 5000 %}unlocked{% else %}locked{% endif %}">
+                            <div class="badge-icon">🎓</div>
+                            <div class="badge-name">Graduate</div>
+                            <div class="badge-desc">
+                                {% if total_xp >= 5000 %}Scholar Status{% else %}Unlock at 5000 XP{% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    <div style="margin-top: 32px;">
+                        <div class="section-header">
+                            <div class="section-title">Recent Quiz History</div>
+                        </div>
+                        <div class="cert-list">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Topic</th>
+                                        <th>Date</th>
+                                        <th>Score</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for res in results %}
+                                    <tr>
+                                        <td>
+                                            {% if res.content %}
+                                                {{ res.content.title }}
+                                            {% else %}
+                                                {{ res.topic }}
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ res.date_taken|date:"M d" }}</td>
+                                        <td style="font-weight:bold;">{{ res.score }} / {{ res.total_questions }}</td>
+                                        <td>
+                                            {% if res.score >= 3 %}
+                                                <span class="score-badge score-good">Passed</span>
+                                            {% else %}
+                                                <span class="score-badge score-bad">Review</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="/review_quiz_result/{{ res.id }}/" class="btn-view-quiz">View Quiz</a>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="5" style="text-align:center; padding:20px; color:#64748b;">
+                                            No quiz history found. Go to the Quiz tab to start!
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">Class Leaderboard</div>
+                    </div>
+
+                    <div class="leaderboard-list">
+                        
+                        {% for student in leaderboard %}
+                        <div class="lb-row {% if student.is_me %}highlight{% endif %}">
+                            <div class="lb-rank rank-{{ forloop.counter }}">{{ forloop.counter }}</div>
+                            <div class="lb-user">
+                                <div class="lb-avatar">
+                                    {% if student.image %}
+                                        <img src="{{ student.image.url }}">
+                                    {% else %}
+                                        <img src="https://ui-avatars.com/api/?name={{ student.name }}&background=2563EB&color=fff">
+                                    {% endif %}
+                                </div>
+                                <span style="font-size:13px;">
+                                    {{ student.name }} 
+                                    {% if student.is_me %}(You){% endif %}
+                                </span>
+                            </div>
+                            <div class="lb-xp">{{ student.xp }} XP</div>
+                        </div>
+                        {% endfor %}
+
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 16px; background: #eff6ff; border-radius: 12px; border: 1px dashed var(--primary-blue);">
+                        <p style="font-size: 12px; text-align: center; color: var(--primary-blue);">
+                            🚀 Keep taking quizzes to climb the ranks!
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+  <div class="modal-overlay" id="logout-modal">
+  <div class="modal-box">
+    <h2>Confirm Logout</h2>
+    <p>Are you sure you want to log out?</p>
+    <div class="modal-buttons">
+      <button class="btn btn-confirm" id="confirm-logout">Yes</button>
+      <button class="btn btn-cancel" id="cancel-logout">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const logoutLink = document.querySelector(".logout-container .nav-item");
+  const modal = document.getElementById("logout-modal");
+  const confirmBtn = document.getElementById("confirm-logout");
+  const cancelBtn = document.getElementById("cancel-logout");
+
+  // Show popup when logout is clicked
+  if(logoutLink){
+      logoutLink.addEventListener("click", function(event) {
+        event.preventDefault();
+        modal.style.display = "flex";
+      });
+  }
+
+  // Confirm logout
+  if(confirmBtn){
+      confirmBtn.addEventListener("click", function() {
+        window.location.href = logoutLink.getAttribute("href");
+      });
+  }
+
+  // Cancel logout
+  if(cancelBtn){
+      cancelBtn.addEventListener("click", function() {
+        modal.style.display = "none";
+      });
+  }
+</script>
+  
+
+</body>
+</html>

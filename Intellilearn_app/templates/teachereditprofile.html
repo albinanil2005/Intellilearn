@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntelliLearn - Edit Profile</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --primary-blue: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg-color: #f3f4f6;
+            --sidebar-width: 260px;
+            --text-dark: #1e293b;
+            --text-medium: #475569;
+            --text-light: #94a3b8;
+            --border-color: #e2e8f0;
+            --danger: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body { background-color: var(--bg-color); color: var(--text-dark); height: 100vh; overflow: hidden; }
+
+        .container { display: flex; height: 100%; }
+
+        /* --- SIDEBAR --- */
+        .sidebar { width: var(--sidebar-width); background: #ffffff; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 1.5rem; flex-shrink: 0; }
+        .logo { font-size: 1.4rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 2.5rem; display: flex; align-items: center; gap: 10px; }
+        .sidebar nav ul { list-style: none; }
+        .sidebar nav ul li { margin-bottom: 0.5rem; }
+        .sidebar nav ul li a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; text-decoration: none; color: var(--text-medium); font-weight: 500; border-radius: 8px; transition: all 0.2s; }
+        .sidebar nav ul li.active a, .sidebar nav ul li a:hover { background-color: var(--primary-blue); color: white; }
+
+        /* Back Button Styling */
+        .back-button {
+            border: 2px solid var(--primary-blue);
+            color: var(--primary-blue);
+            background-color: transparent;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex; align-items: center; gap: 12px; padding: 12px 15px; text-decoration: none; border-radius: 8px;
+        }
+        .back-button:hover {
+            background-color: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { flex: 1; overflow-y: auto; padding: 2rem; display: flex; flex-direction: column; }
+
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .page-title h2 { font-size: 1.5rem; font-weight: 600; }
+        .user-profile-mini { display: flex; align-items: center; gap: 15px; }
+        .user-profile-mini img { width: 35px; height: 35px; border-radius: 50%; border: 1px solid #ddd; object-fit: cover; }
+
+        /* --- EDIT PROFILE LAYOUT --- */
+        .profile-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 1000px;
+        }
+
+        .profile-left { display: flex; flex-direction: column; align-items: center; border-right: 1px solid var(--border-color); padding-right: 30px; }
+        
+        .img-container {
+            width: 150px; height: 150px; border-radius: 50%;
+            border: 3px solid var(--border-color); overflow: hidden; margin-bottom: 20px;
+        }
+        .img-container img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Upload Button */
+        .btn-upload {
+            background-color: white; border: 1px solid var(--border-color); color: var(--text-dark);
+            padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .btn-upload:hover { background-color: #f8fafc; border-color: var(--primary-blue); color: var(--primary-blue); }
+
+        /* Right Side Form */
+        .profile-form { padding-left: 10px; }
+        .form-header { margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+        .form-header h3 { font-size: 1.1rem; font-weight: 600; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .full-width { grid-column: 1 / -1; }
+
+        .form-group label { font-size: 0.85rem; font-weight: 600; color: var(--text-dark); }
+        
+        .form-control {
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            outline: none;
+            background-color: white;
+            transition: 0.2s;
+        }
+        .form-control:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .form-control:read-only { background-color: #f1f5f9; cursor: not-allowed; color: var(--text-medium); }
+
+        .form-actions { margin-top: 30px; display: flex; justify-content: flex-end; gap: 15px; }
+
+        .btn { padding: 10px 24px; border-radius: 6px; font-weight: 500; cursor: pointer; font-size: 0.9rem; text-decoration: none; text-align: center; }
+        .btn-primary { background-color: var(--primary-blue); color: white; border: none; }
+        .btn-primary:hover { background-color: var(--primary-dark); }
+        
+        .btn-outline { background-color: white; border: 1px solid var(--border-color); color: var(--text-medium); }
+        .btn-outline:hover { background-color: #f8fafc; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo"><i class="fa-solid fa-graduation-cap"></i> IntelliLearn</div>
+            <nav>
+                <ul>
+                    <li><a href="javascript:history.back()" class="back-button"><span> < </span> Back</a></li>
+                    <li class="active"><a href="#"><i class="fa-solid fa-user"></i> My Profile</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <div class="page-title"><h2>Edit Profile</h2></div>
+                <div class="user-profile-mini">
+                    {% if user.image %}
+                        <img src="{{ user.image.url }}" alt="Profile">
+                    {% else %}
+                        <img src="https://ui-avatars.com/api/?name={{ user.name|default:'Teacher' }}" alt="Profile">
+                    {% endif %}
+                    <span style="font-size:0.9rem; font-weight:500;">{{ user.name }} </span>
+                </div>
+            </header>
+
+            <div class="profile-layout">
+                
+                <div class="profile-left">
+                    <div class="img-container">
+                        {% if user.image %}
+                            <img id="profile-preview" src="{{ user.image.url }}" alt="Profile Picture">
+                        {% else %}
+                            <img id="profile-preview" src="https://ui-avatars.com/api/?name={{ user.name|default:'Teacher' }}&size=200" alt="Profile Picture">
+                        {% endif %}
+                    </div>
+                    
+                    </div>
+
+                <div class="profile-form">
+                    <form action="" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="form-group" style="margin-bottom: 20px;">
+                             <label for="imageUpload" class="btn-upload" style="width: fit-content;">
+                                <i class="fa-solid fa-camera"></i> Change Photo
+                            </label>
+                            <input type="file" id="imageUpload" name="image" style="display: none;" onchange="document.getElementById('profile-preview').src = window.URL.createObjectURL(this.files[0])">
+                        </div>
+
+                         <div class="form-header"><h3>Personal Information</h3></div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label>Full Name</label>
+                                <input type="text" name="name" class="form-control" value="{{ user.name }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <input type="email" name="email" class="form-control" value="{{ user.email }}" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input type="tel" name="phone" class="form-control" value="{{ user.phone }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Age</label>
+                                <input type="number" name="age" class="form-control" value="{{ user.age }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Experience</label>
+                                <input type="text" name="experience" class="form-control" value="{{ user.experience }}">
+                            </div>
+                            <div class="form-group full-width">
+                                <label>Specialization</label>
+                                <input type="text" name="specialization" class="form-control" value="{{ user.specialization }}">
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <a href="/teacherprofile/" class="btn btn-outline">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntelliLearn - Verify OTP</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-dark: #0f172a;
+            --primary-blue: #1e40af;
+            --text-grey: #4b5563;
+            --bg-light: #f8fafc;
+            --white: #ffffff;
+            --border-color: #e2e8f0;
+            --teacher-btn-color: #c29b40;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--primary-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a { text-decoration: none; color: inherit; }
+
+        .container { max-width: 1200px; margin: auto; padding: 0 20px; }
+
+        header {
+            background: var(--white);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            gap: 10px;
+        }
+
+        .logo i { color: var(--primary-blue); }
+
+        .login-section {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px;
+        }
+
+        .login-card {
+            background: var(--white);
+            width: 100%;
+            max-width: 420px;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+        }
+
+        .login-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: var(--text-grey);
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-light);
+            font-size: 1rem;
+            letter-spacing: 4px;
+            text-align: center;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--teacher-btn-color);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(194, 155, 64, 0.2);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--teacher-btn-color);
+            color: white;
+            padding: 14px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+
+        .btn-submit:hover {
+            background: #a37f30;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(194,155,64,0.3);
+        }
+
+        .error-msg {
+            background: #fff7ed;
+            color: #c2410c;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            border: 1px solid #ffedd5;
+        }
+
+        footer {
+            background: var(--primary-dark);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <nav>
+            <a href="/index/" class="logo">
+                <i class="fas fa-graduation-cap"></i> IntelliLearn
+            </a>
+        </nav>
+    </div>
+</header>
+
+<section class="login-section">
+    <div class="login-card">
+
+        <div class="login-header">
+            <h1>Verify OTP</h1>
+            <p>Enter the 6-digit OTP sent to your email</p>
+        </div>
+
+        {% if msg %}
+            <div class="error-msg">
+                <i class="fas fa-exclamation-circle"></i> {{ msg }}
+            </div>
+        {% endif %}
+
+        <form method="POST" action="{% url 'verify_otp' %}">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="otp">One Time Password</label>
+                <input type="text" id="otp" name="otp" maxlength="6" placeholder="••••••" required>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                Verify OTP <i class="fas fa-check-circle"></i>
+            </button>
+        </form>
+
+    </div>
+</section>
+
+<footer>
+    <p>Meet The Future Of Learning</p>
+</footer>
+
+</body>
+</html>

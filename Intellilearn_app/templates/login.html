@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntelliLearn - Student Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- COPYING VARIABLES FROM INDEX.HTML --- */
+        :root {
+            --primary-dark: #0f172a;    /* Dark Navy */
+            --primary-blue: #1e40af;    /* Button Blue */
+            --accent-gold: #d97706;     /* Button Gold/Tan */
+            --text-grey: #4b5563;
+            --bg-light: #f8fafc;
+            --white: #ffffff;
+            --max-width: 1200px;
+            --border-color: #e2e8f0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--primary-dark);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        
+        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 20px; }
+
+        /* --- HEADER (MATCHING INDEX) --- */
+        header {
+            background: var(--white);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        nav { display: flex; justify-content: space-between; align-items: center; }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo i { color: var(--primary-blue); }
+
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+
+        .nav-links a:not(.btn) {
+            font-size: 0.95rem; font-weight: 500; color: var(--text-grey);
+            transition: all 0.3s ease; position: relative;
+        }
+        .nav-links a:not(.btn):hover { color: var(--primary-blue); transform: translateY(-2px); }
+        .nav-links a:not(.btn)::after {
+            content: ''; position: absolute; width: 0; height: 2px; bottom: -4px; left: 0;
+            background-color: var(--primary-blue); transition: width 0.3s ease;
+        }
+        .nav-links a:not(.btn):hover::after { width: 100%; }
+
+        .nav-links .btn { padding: 10px 20px; font-size: 0.85rem; color: var(--white); border-radius: 50px; }
+        .btn-student { background-color: var(--primary-dark); }
+        .btn-teacher { background-color: #c29b40; }
+
+        /* --- Active State Styles for Navbar Buttons --- */
+        /* CHANGED: Increased box-shadow spread from 3px to 6px */
+        .nav-links .btn.active {
+            font-weight: 700; 
+            box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.4); /* BIGGER Blue Highlight Ring */
+            transform: translateY(0); 
+        }
+
+        /* Specific Highlight color for Teacher button (when active) */
+        /* CHANGED: Increased box-shadow spread from 3px to 6px */
+        .btn-teacher.active {
+            box-shadow: 0 0 0 6px rgba(217, 119, 6, 0.4); /* BIGGER Gold Highlight Ring */
+        }
+
+        /* --- LOGIN SECTION DESIGN --- */
+        .login-section {
+            flex: 1; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px;
+        }
+
+        .login-card {
+            background: var(--white);
+            width: 100%;
+            max-width: 450px; /* Compact width for login */
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            padding: 40px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .login-header { margin-bottom: 30px; }
+        .login-header h1 { font-size: 1.8rem; color: var(--primary-dark); margin-bottom: 10px; }
+        .login-header p { color: var(--text-grey); font-size: 0.95rem; }
+
+        /* --- FORM ELEMENTS STYLING --- */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary-dark);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-light);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            color: var(--primary-dark);
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary-blue);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+
+        /* Forgot Password Link */
+        .forgot-password-link {
+            display: block;
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--primary-blue);
+            font-weight: 500;
+            margin-top: -10px;
+            margin-bottom: 20px;
+        }
+        .forgot-password-link:hover { text-decoration: underline; }
+
+        /* Login Button (Pill Shape) */
+        .btn-dark {
+            width: 100%;
+            background-color: var(--primary-dark);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-dark:hover {
+            transform: translateY(-2px);
+            background-color: #1e293b;
+            box-shadow: 0 5px 15px rgba(15, 23, 42, 0.2);
+        }
+
+        /* Redirect Link */
+        .redirect-link {
+            margin-top: 25px;
+            font-size: 0.9rem;
+            color: var(--text-grey);
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+        .redirect-link a {
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+        .redirect-link a:hover { text-decoration: underline; }
+
+        /* --- FOOTER (MATCHING INDEX) --- */
+        footer {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            padding: 40px 0;
+            margin-top: auto;
+        }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+        .footer-nav { display: flex; gap: 20px; }
+        .footer-nav a { color: #cbd5e1; font-size: 0.9rem; transition: color 0.3s; }
+        .footer-nav a:hover { color: var(--white); }
+        .social-icons { display: flex; gap: 15px; }
+        .social-icons a {
+            width: 35px; height: 35px; background: rgba(255,255,255,0.1);
+            display: flex; justify-content: center; align-items: center;
+            border-radius: 50%; transition: background 0.3s;
+        }
+        .social-icons a:hover { background: var(--primary-blue); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .footer-content { flex-direction: column; gap: 20px; }
+            .login-card { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="/index/" class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    IntelliLearn
+                </a>
+                <ul class="nav-links">
+                   
+                    <li>
+                        <a href="{% url 'login' %}" class="btn btn-student active">
+                            Student Login
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a href="{% url 'TeacherLogin' %}" class="btn btn-teacher">
+                            Teacher Login
+                        </a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="login-section">
+        <div class="login-card">
+            
+            <div class="login-header">
+                <h1>Student Login</h1>
+                <p>Log in to access your personalized learning roadmap.</p>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="Email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Password" required>
+                </div>
+
+                <a href="/forgot-password" class="forgot-password-link">Forgot Password?</a>
+
+                <button type="submit" class="btn-dark">
+                    Login <i class="fas fa-arrow-right"></i>
+                </button>
+
+                <div class="redirect-link">
+                    <span>Don't have an account? </span>
+                    <a href="/register/">Sign Up</a> 
+                </div>
+
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo" style="color: white; font-size: 1.2rem;">
+                    <i class="fas fa-graduation-cap"></i>
+                    IntelliLearn
+                </div>
+                
+                <div class="footer-nav">
+                    <p> Meet The Future Of Learning </p>
+                </div>
+
+               
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

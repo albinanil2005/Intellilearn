@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable - IntelliLearn</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- CSS VARIABLES --- */
+        :root {
+            --bg-body: #f8fafc;       
+            --bg-card: #ffffff;       
+            --bg-sidebar: #ffffff;    
+            --primary-dark: #0f172a;  
+            --primary-blue: #2563EB;  
+            --primary-light: #EFF6FF;
+            --text-main: #1f2937;     
+            --text-muted: #64748b;    
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --success: #10b981;
+            --danger: #ef4444; 
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            z-index: 10;
+        }
+
+        .logo-container { display: flex; align-items: center; margin-bottom: 40px; padding-left: 5px; }
+        .logo-text { font-size: 1.5rem; font-weight: 700; color: var(--primary-dark); display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo-text i { color: var(--primary-blue); }
+
+        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            color: var(--text-muted); text-decoration: none; border-radius: var(--radius-md);
+            transition: all 0.2s ease; font-weight: 500;
+        }
+        .nav-item:hover { background-color: #f1f5f9; color: var(--primary-blue); }
+        .nav-item.active { background-color: var(--primary-blue); color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); }
+
+        .logout-container { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color); }
+        .logout-container .nav-item:hover { background-color: #fef2f2; color: var(--danger) !important; }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; background-color: var(--bg-body); }
+
+        header {
+            height: 80px; border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 32px; background: var(--bg-card);
+        }
+
+        .profile-section { display: flex; align-items: center; gap: 12px; padding-left: 24px; border-left: 1px solid var(--border-color); }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background-color: #cbd5e1; overflow: hidden; border: 2px solid white; box-shadow: var(--shadow-sm); }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* --- TIMETABLE BODY LAYOUT --- */
+        .timetable-body {
+            padding: 32px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: 350px 1fr; /* Fixed AI width, flexible plan */
+            gap: 32px;
+            height: 100%;
+            align-items: start;
+        }
+
+        /* --- 1. AI GENERATOR CARD (LEFT) --- */
+        .ai-generator-card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* Gradient Glow at top */
+        .ai-generator-card::before {
+            content: ''; position: absolute; top: -50px; left: 50%; transform: translateX(-50%);
+            width: 150px; height: 150px; background: rgba(37, 99, 235, 0.15);
+            border-radius: 50%; filter: blur(40px); z-index: 0;
+        }
+
+        .ai-icon-container {
+            width: 64px; height: 64px; background: linear-gradient(135deg, #2563EB, #4F46E5);
+            border-radius: 16px; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px auto; position: relative; z-index: 1;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+        .ai-icon-container i { color: white; font-size: 28px; }
+
+        .ai-title { font-size: 18px; font-weight: 700; color: var(--primary-dark); margin-bottom: 24px; position: relative; z-index: 1; }
+
+        .form-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 6px; display: block; text-align: left; }
+        
+        .form-select {
+            width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 10px;
+            font-size: 13px; color: var(--primary-dark); outline: none; margin-bottom: 16px;
+            background: #f8fafc; transition: 0.2s;
+        }
+        .form-select:focus { border-color: var(--primary-blue); background: white; }
+
+        .generate-btn-lg {
+            width: 100%; background: linear-gradient(90deg, #2563EB, #3b82f6); border: none;
+            padding: 14px; border-radius: 12px; color: white; font-weight: 600; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); transition: transform 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .generate-btn-lg:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(37, 99, 235, 0.4); }
+
+        .sync-text { font-size: 11px; color: var(--text-muted); margin-top: 16px; font-weight: 500; }
+        .progress-fake {
+            height: 6px; background: #e2e8f0; border-radius: 10px; margin-top: 8px; overflow: hidden;
+        }
+        .progress-fill { width: 0%; height: 100%; background: var(--primary-blue); border-radius: 10px; transition: width 1s; }
+
+        /* --- 2. WEEKLY STUDY PLAN (RIGHT) --- */
+        .plan-container {
+            background: white; border-radius: 20px; padding: 32px;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
+            min-height: 500px; display: flex; flex-direction: column;
+        }
+
+        .plan-header { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+        .plan-header h2 { font-size: 22px; font-weight: 700; color: var(--primary-dark); }
+
+        /* Day Tabs */
+        .day-tabs {
+            display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 1px;
+        }
+        .tab-btn {
+            padding: 10px 24px; background: none; border: none; font-size: 14px; font-weight: 600;
+            color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s;
+        }
+        .tab-btn.active { color: var(--primary-blue); border-bottom-color: var(--primary-blue); }
+        .tab-btn:hover { color: var(--primary-dark); }
+
+        /* Schedule List */
+        .schedule-list { display: none; flex-direction: column; gap: 16px; animation: fadeIn 0.3s ease; }
+        .schedule-list.active { display: flex; }
+
+        .schedule-card {
+            display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 20px; border-left: 5px solid var(--primary-blue);
+            transition: transform 0.2s; cursor: pointer;
+        }
+        .schedule-card:hover { transform: translateX(5px); background: white; box-shadow: var(--shadow-sm); border-color: var(--primary-blue); }
+
+        .time-slot { font-weight: 700; font-size: 14px; color: var(--primary-dark); width: 140px; }
+        
+        .subject-info { flex: 1; }
+        .subject-name { font-weight: 700; font-size: 15px; color: var(--text-main); margin-bottom: 4px; }
+        .subject-topic { font-size: 13px; color: var(--text-muted); }
+
+        .action-buttons { display: flex; gap: 10px; align-items: center; }
+
+        .btn-mark {
+            padding: 8px 16px; background: white; border: 1px solid var(--border-color);
+            border-radius: 8px; color: var(--text-muted); font-size: 12px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-mark:hover { border-color: var(--primary-dark); color: var(--primary-dark); }
+
+        .btn-mark.completed {
+            background-color: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .btn-quiz {
+            padding: 8px 16px; background: var(--primary-blue); color: white; border: none;
+            border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: none;
+            display: flex; align-items: center; gap: 6px; transition: 0.2s;
+        }
+        .btn-quiz:hover { background: #1d4ed8; }
+
+        /* DELETE BUTTON STYLES */
+        .btn-delete {
+            padding: 8px 12px; background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5;
+            border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.2s;
+        }
+        .btn-delete:hover { background: #ef4444; color: white; border-color: #ef4444; }
+
+        .empty-day { text-align: center; color: var(--text-muted); padding: 40px; font-size: 14px; }
+
+        /* Modal for Add Event (Floating Button Style) */
+        .floating-add {
+            margin-left: auto; background: var(--primary-dark); color: white; border: none;
+            padding: 10px 20px; border-radius: 8px; font-size: 13px; cursor: pointer; display: flex; gap: 8px; align-items: center;
+        }
+
+        /* --- MODAL STYLES --- */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 2000; }
+        .modal-box { background: white; padding: 30px; border-radius: 16px; width: 400px; box-shadow: var(--shadow-md); position:relative; }
+        .modal-input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 8px; outline: none; }
+
+        /* FOCUS MODAL STYLES */
+        .focus-content {
+            background: #f0f9ff; border: 1px solid #bae6fd; color: #0369a1;
+            padding: 15px; border-radius: 10px; font-size: 14px; line-height: 1.6;
+            margin-top: 10px; max-height: 300px; overflow-y: auto; white-space: pre-wrap; /* Preserves line breaks */
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo-container">
+            <a href="#" class="logo-text"><i class="fas fa-graduation-cap"></i> IntelliLearn</a>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="/studentdashboard/" class="nav-item"><span>📊</span> Dashboard</a></li>
+            <li><a href="/studentcourses/" class="nav-item"><span>📚</span> My Courses</a></li>
+            <li><a href="/studentquiz/" class="nav-item"><span>📝</span> Quiz</a></li>
+            <li><a href="/studenttimetable/" class="nav-item active"><span>📅</span> Timetable</a></li>
+            <li><a href="/studentachievements/" class="nav-item"><span>🏆</span> Achievements</a></li>
+             <li><a href="/studentprofile/" class="nav-item"><span>👤</span> My Profile</a></li>
+        </ul>
+        <div class="logout-container">
+            <a href="/index/" class="nav-item" style="color: var(--text-muted);"><span>🚪</span> Logout</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <div style="display: flex; flex-direction: column;">
+                <h2 style="font-size: 20px; font-weight: 600; color: var(--primary-dark);">My Schedule</h2>
+                <span style="font-size: 12px; color: var(--text-muted);">Manage your classes and study time</span>
+            </div>
+            <div class="profile-section">
+                <div style="text-align: right;">
+                    <div style="font-weight: 600; font-size: 14px; color: var(--primary-dark);">{{ user.name }}</div>
+                </div>
+                <div class="avatar">
+                    {% if user.image %} <img src="{{ user.image.url }}"> {% else %} <img src="https://ui-avatars.com/api/?name={{ user.name }}&background=2563EB&color=fff"> {% endif %}
+                </div>
+            </div>
+        </header>
+
+        <div class="timetable-body">
+            
+            <div class="ai-generator-card">
+                <div class="ai-icon-container">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3 class="ai-title">AI Timetable Generator</h3>
+                
+                <form method="POST" id="aiForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="generate_ai" value="true">
+                    
+                    <label class="form-label">Study Duration (Hours per Day)</label>
+                    <input type="number" name="hours" class="form-select" min="1" max="6" value="{{ last_hours|default:4 }}" required>
+
+                    <label class="form-label">Energy Level</label>
+                    <select name="energy_time" class="form-select">
+                        <option value="Morning Person">Morning</option>
+                        <option value="Night Owl">Night</option>
+                    </select>
+
+                    <button type="submit" class="generate-btn-lg">
+                        Generate Weekly Schedule <i class="fas fa-magic"></i>
+                    </button>
+                </form>
+
+                <div class="sync-text">Synced with Teacher Notes ({{ courses|length }} Subjects)</div>
+                <div class="progress-fake">
+                    <div class="progress-fill" id="pFill"></div>
+                </div>
+                <div id="pText" style="font-size:10px; color:var(--text-muted); margin-top:4px; display:none;">Processing...</div>
+            </div>
+
+            <div class="plan-container">
+                <div class="plan-header">
+                    <h2>Weekly Study Plan</h2>
+                    <button class="floating-add" onclick="openAddModal()">
+                        <i class="fas fa-plus"></i> Manual Add
+                    </button>
+                </div>
+
+                <div class="day-tabs">
+                    <button class="tab-btn active" onclick="openTab('Mon')">Monday</button>
+                    <button class="tab-btn" onclick="openTab('Tue')">Tuesday</button>
+                    <button class="tab-btn" onclick="openTab('Wed')">Wednesday</button>
+                    <button class="tab-btn" onclick="openTab('Thu')">Thursday</button>
+                    <button class="tab-btn" onclick="openTab('Fri')">Friday</button>
+                </div>
+
+                {% for day_name in days %}
+                <div id="{{ day_name }}" class="schedule-list {% if forloop.first %}active{% endif %}">
+                    
+                    {% for row in timetable_matrix %}
+                        {% if forloop.counter <= last_hours|add:"0" %}
+                            {% with day_index=forloop.parentloop.counter0 %} {% for event in row.slots %}
+                                    {% if forloop.counter0 == day_index %}
+                                        {% if event %}
+                                            <div class="schedule-card" 
+                                                 data-title="{{ event.subject }}" 
+                                                 data-note="{{ event.note }}" 
+                                                 onclick="showFocusModal(this)">
+                                                
+                                                <div class="time-slot">{{ row.time }}</div>
+                                                <div class="subject-info">
+                                                    <div class="subject-name">{{ event.subject }}</div>
+                                                    <div class="subject-topic"><i class="fas fa-location-dot"></i> {{ event.location }}</div>
+                                                </div>
+                                                <div class="action-buttons">
+                                                    <button class="btn-mark" onclick="event.stopPropagation(); markCompleted(this)">
+                                                        Mark as Completed
+                                                    </button>
+                                                    
+                                                    <form action="/studentquiz/" method="POST" style="display:inline;" onclick="event.stopPropagation();">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="topic" value="{{ event.subject }}">
+                                                        <input type="hidden" name="difficulty" value="Medium">
+                                                        <button type="submit" class="btn-quiz">
+                                                            <i class="fas fa-clipboard-check"></i> Take Quiz
+                                                        </button>
+                                                    </form>
+
+                                                    <form method="POST" style="display:inline;" onclick="event.stopPropagation();">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="delete_event" value="true">
+                                                        <input type="hidden" name="event_id" value="{{ event.id }}">
+                                                        <button type="submit" class="btn-delete" title="Remove Class">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <div class="schedule-card" style="border-left-color: #e2e8f0; opacity: 0.6; cursor: default;">
+                                                <div class="time-slot">{{ row.time }}</div>
+                                                <div class="subject-info">
+                                                    <div class="subject-name" style="color: #94a3b8;">Free Slot</div>
+                                                    <div class="subject-topic">No class scheduled</div>
+                                                </div>
+                                                <div class="action-buttons">
+                                                    <button class="floating-add" style="padding: 6px 12px; font-size: 11px;" onclick="openAddModal()">
+                                                        <i class="fas fa-plus"></i> Add
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <div class="empty-day" style="display:none;">No classes scheduled for this day.</div>
+                </div>
+                {% endfor %}
+
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="add-event-modal">
+        <div class="modal-box">
+            <h2 style="margin-bottom: 20px;">Add New Class</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="add_event" value="true">
+                
+                <label class="form-label">Subject</label>
+                <select name="subject" class="modal-input" required>
+                    <option value="" disabled selected>Select a Course...</option>
+                    {% for c in courses %}
+                        <option value="{{ c.title }}">{{ c.title }}</option>
+                    {% endfor %}
+                    <option value="Self Study">Self Study</option>
+                    <option value="Break">Break</option>
+                </select>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label class="form-label">Day</label>
+                        <select name="day" class="modal-input">
+                            <option value="Mon">Monday</option>
+                            <option value="Tue">Tuesday</option>
+                            <option value="Wed">Wednesday</option>
+                            <option value="Thu">Thursday</option>
+                            <option value="Fri">Friday</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Time</label>
+                        <select name="time_slot" class="modal-input">
+                            <option value="09:00">09:00</option>
+                            <option value="10:00">10:00</option>
+                            <option value="11:00">11:00</option>
+                            <option value="12:00">12:00</option>
+                            <option value="01:00">01:00</option>
+                            <option value="02:00">02:00</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label class="form-label">Location / Focus</label>
+                <input type="text" name="location" class="modal-input" placeholder="e.g. Lab 1">
+
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="submit" class="generate-btn-lg" style="padding:10px;">Save</button>
+                    <button type="button" class="generate-btn-lg" style="background:#e2e8f0; color:black; padding:10px;" onclick="closeAddModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="focus-modal">
+        <div class="modal-box">
+            <h2 id="focus-title" style="color:var(--primary-blue);">Subject</h2>
+            <p style="margin-bottom:10px; font-weight:600;">🎯 Key Priorities & Notes:</p>
+            <div id="focus-content" class="focus-content">
+                </div>
+            <button class="generate-btn-lg" style="margin-top:20px; padding:10px;" onclick="closeFocusModal()">Close</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="logout-modal">
+        <div class="modal-box">
+            <h2>Confirm Logout</h2>
+            <p>Are you sure you want to log out?</p>
+            <div class="modal-buttons">
+                <button class="btn btn-confirm" id="confirm-logout">Yes</button>
+                <button class="btn btn-cancel" id="cancel-logout">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // TAB LOGIC
+        function openTab(dayId) {
+            document.querySelectorAll('.schedule-list').forEach(list => list.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(dayId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // --- TOGGLE MARK COMPLETED ---
+        function markCompleted(button) {
+            if (button.classList.contains('completed')) {
+                button.innerHTML = 'Mark as Completed';
+                button.classList.remove('completed');
+            } else {
+                button.innerHTML = '<i class="fas fa-check"></i> Completed';
+                button.classList.add('completed');
+            }
+        }
+
+        // Modal Logic: Add Event
+        function openAddModal() { document.getElementById('add-event-modal').style.display = 'flex'; }
+        function closeAddModal() { document.getElementById('add-event-modal').style.display = 'none'; }
+
+        // --- FIX 2: IMPROVED MODAL CONTENT DISPLAY ---
+        function showFocusModal(cardElement) {
+            const title = cardElement.getAttribute('data-title');
+            const note = cardElement.getAttribute('data-note');
+            
+            document.getElementById('focus-title').innerText = title;
+            
+            // Check if note is available or meaningful
+            if (note && note.trim() !== "" && note !== "None") {
+                document.getElementById('focus-content').innerHTML = note; // Use innerHTML to respect AI formatting
+            } else {
+                // Better default message
+                document.getElementById('focus-content').innerHTML = "<em>No AI summary available for this specific topic yet. Please review your lecture notes.</em>";
+            }
+            
+            document.getElementById('focus-modal').style.display = 'flex';
+        }
+        function closeFocusModal() {
+            document.getElementById('focus-modal').style.display = 'none';
+        }
+
+        // AI Loading Animation
+        const aiForm = document.getElementById('aiForm');
+        if(aiForm) {
+            aiForm.addEventListener('submit', function() {
+                document.getElementById('pText').style.display = 'block';
+                document.getElementById('pFill').style.width = '100%';
+            });
+        }
+
+        // Logout Logic
+        const logoutLink = document.querySelector(".logout-container .nav-item");
+        const modal = document.getElementById("logout-modal");
+        const confirmBtn = document.getElementById("confirm-logout");
+        const cancelBtn = document.getElementById("cancel-logout");
+
+        if(logoutLink) logoutLink.addEventListener("click", (e) => { e.preventDefault(); modal.style.display = "flex"; });
+        if(confirmBtn) confirmBtn.addEventListener("click", () => { window.location.href = logoutLink.getAttribute("href"); });
+        if(cancelBtn) cancelBtn.addEventListener("click", () => { modal.style.display = "none"; });
+    </script>
+
+</body>
+</html>

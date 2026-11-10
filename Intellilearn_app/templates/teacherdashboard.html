@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntelliLearn - Teacher Dashboard</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* --- CSS STYLES --- */
+        :root {
+            --primary-blue: #2563eb; --bg-color: #f3f4f6; --sidebar-width: 260px;
+            --text-dark: #1e293b; --text-light: #64748b; --card-bg: #ffffff;
+            --border-color: #e2e8f0; --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        /* PREVENT BODY SCROLL */
+        body { background-color: var(--bg-color); color: var(--text-dark); height: 100vh; overflow: hidden; }
+        .container { display: flex; height: 100%; }
+        
+        /* SIDEBAR */
+        .sidebar { width: var(--sidebar-width); background: #ffffff; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 1.5rem; flex-shrink: 0; }
+        .logo { font-size: 1.4rem; font-weight: 700; color: #1d4ed8; margin-bottom: 2.5rem; display: flex; align-items: center; gap: 10px; }
+        .sidebar nav ul { list-style: none; }
+        .sidebar nav ul li { margin-bottom: 0.5rem; }
+        .sidebar nav ul li a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; text-decoration: none; color: var(--text-light); font-weight: 500; border-radius: 8px; transition: all 0.2s; }
+        .sidebar nav ul li.active a, .sidebar nav ul li a:hover { background-color: #2563eb; color: white; }
+        .logout-container { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color); }
+        .logout-link { display: flex; align-items: center; gap: 12px; padding: 12px 15px; text-decoration: none; color: var(--text-light); font-weight: 500; border-radius: 8px; transition: all 0.2s; }
+        .logout-link:hover { background-color: #fef2f2; color: var(--danger) !important; }
+
+        /* MAIN CONTENT - FIXED VIEWPORT */
+        .main-content { 
+            flex: 1; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; /* Disable page scroll */
+            padding: 2rem; 
+        }
+        
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-shrink: 0; }
+        header h2 { font-size: 1.5rem; color: #1e293b; }
+        .user-profile { display: flex; align-items: center; gap: 20px; }
+        .notification { position: relative; font-size: 1.2rem; color: var(--text-light); cursor: pointer; }
+        .notification .badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; font-size: 0.7rem; padding: 2px 5px; border-radius: 50%; }
+        .user-info { display: flex; align-items: center; gap: 10px; font-weight: 500; cursor: pointer; }
+        .user-info img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #e2e8f0; object-fit: cover; }
+
+        /* DASHBOARD GRID - FILLS REMAINING HEIGHT */
+        .dashboard-grid { 
+            flex: 1; 
+            min-height: 0; /* Allows flex children to scroll */
+            display: grid; 
+            grid-template-columns: 2fr 1fr; 
+            gap: 20px; 
+        }
+        
+        .left-column { 
+            display: flex; flex-direction: column; gap: 20px; 
+            overflow-y: auto; /* Independent scroll if needed */
+            padding-right: 5px;
+        }
+        
+        .right-column { 
+            display: flex; flex-direction: column; gap: 20px; 
+            height: 100%; /* Fill height */
+            min-height: 0;
+        }
+
+        .card { background: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border: 1px solid var(--border-color); }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .section-header h3 { font-size: 1rem; font-weight: 600; margin: 0; }
+
+        /* STATS */
+        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; flex-shrink: 0; }
+        .stat-card { position: relative; overflow: hidden; }
+        .blue-bg { background-color: #eff6ff; } .green-bg { background-color: #ecfdf5; } .mint-bg { background-color: #f0fdf4; }
+        .stat-card h3 { font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px; }
+        .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin-bottom: 15px; }
+        .mini-chart { display: flex; align-items: flex-end; gap: 5px; height: 40px; }
+        .mini-chart .bar { width: 8px; border-radius: 4px; background-color: rgba(37, 99, 235, 0.5); }
+        .green-bg .bar { background-color: rgba(16, 185, 129, 0.5); } .mint-bg .bar { background-color: rgba(52, 211, 153, 0.5); }
+
+        /* RECENT CONTENT */
+        .content-gen-section { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+        .file-list { flex: 1; overflow-y: auto; }
+        .file-item { display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid #f1f5f9; }
+        .file-item:last-child { border-bottom: none; }
+        .file-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; margin-right: 15px; font-size: 1.1rem; }
+        .video-icon { background: #6366f1; } .pdf-icon { background: #ef4444; } .audio-icon { background: #f59e0b; }
+        .file-details { flex: 1; margin-right: 20px; }
+        .file-name { display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 6px; color: var(--text-dark); }
+        .progress-bar { height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+        .fill { height: 100%; border-radius: 3px; }
+        .green-fill { background: #10b981; }
+        .file-status { font-size: 0.85rem; font-weight: 500; margin-right: 20px; width: 200px; text-align: right; }
+        .status-ready { color: #10b981; }
+        .file-menu { color: var(--text-light); cursor: pointer; padding: 5px; }
+        .btn-outline { padding: 6px 12px; border: 1px solid var(--border-color); background: white; border-radius: 6px; cursor: pointer; font-size: 0.85rem; color: var(--text-light); text-decoration: none;}
+
+        /* INSIGHTS */
+        .insights-card { flex-shrink: 0; /* Pie chart keeps size */ }
+        .chart-container { display: flex; align-items: center; justify-content: space-around; margin-bottom: 20px; margin-top: 10px; }
+        .pie-chart { width: 130px; height: 130px; border-radius: 50%; }
+        .legend-item { font-size: 0.9rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; color: var(--text-dark); }
+        .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+        .dot.blue { background: #3b82f6; } .dot.green { background: #10b981; } .dot.gray { background: #94a3b8; } .dot.orange { background: #f59e0b; }
+        .btn-primary { width: 100%; padding: 12px; background: #1e293b; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; transition: background 0.2s; text-decoration: none; display: inline-block; text-align: center;}
+        .btn-primary:hover { background: #0f172a; }
+
+        /* --- FLEXIBLE WATCHLIST CARD --- */
+        .watchlist-card {
+            flex: 1; /* Grow to fill remaining space */
+            min-height: 0; /* Allow shrinking */
+            display: flex;
+            flex-direction: column;
+            padding: 0; /* Remove padding to let scroll hit edges */
+            overflow: hidden; /* Hide excess */
+        }
+
+        .watchlist-header {
+            padding: 20px;
+            background: #fff;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0; /* Header stays fixed */
+        }
+
+        .watchlist-scroll {
+            flex: 1; /* Take all available space inside card */
+            overflow-y: auto; /* Scroll ONLY here */
+            padding: 0 20px;
+        }
+
+        /* Scrollbar Styling */
+        .watchlist-scroll::-webkit-scrollbar { width: 6px; }
+        .watchlist-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+        .watchlist-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .watchlist-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .watchlist-table { width: 100%; border-collapse: collapse; }
+        .watchlist-table td { padding: 15px 0; font-size: 0.9rem; border-bottom: 1px solid #f1f5f9; color: var(--text-dark); }
+        .watchlist-table tr:last-child td { border-bottom: none; }
+        
+        .flag { font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .flag.red { color: #ef4444; } .flag.yellow { color: #f59e0b; } .flag.green { color: #10b981; }
+        
+        .btn-check { 
+            background: none; border: 1px solid #3b82f6; color: #3b82f6; 
+            padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;
+        }
+        .btn-check:hover { background: #eff6ff; }
+
+        /* MODALS */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 2000; }
+        .modal-box { background: var(--card-bg); padding: 24px; border-radius: 12px; width: 320px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); animation: fadeIn 0.3s ease; position: relative; }
+        .modal-box h2 { margin-bottom: 12px; font-size: 18px; color: var(--text-dark); }
+        .modal-box p { margin-bottom: 20px; color: var(--text-light); }
+        .modal-buttons { display: flex; justify-content: space-around; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; }
+        .btn-confirm { background: var(--danger); color: #fff; }
+        .btn-cancel { background: #e5e7eb; color: var(--text-dark); }
+        .close-modal { position: absolute; top: 15px; right: 15px; cursor: pointer; font-size: 1.2rem; color: #94a3b8; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo"><i class="fa-solid fa-graduation-cap"></i> IntelliLearn</div>
+            <nav>
+                <ul>
+                    <li class="active"><a href="/teacherdashboard/"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
+                    <li><a href="/teacherclasses/"><i class="fa-regular fa-folder"></i> My Classes</a></li>
+                    <li><a href="/teachercontentupl/"><i class="fa-solid fa-upload"></i> Content Upload</a></li>
+                    <li><a href="/teachercontentlib/"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Content Library</a></li>
+                    <li><a href="/teacherstanaly/"><i class="fa-solid fa-chart-column"></i> Student Analytics</a></li>
+                    <li><a href="/teacherprofile/"><i class="fa-solid fa-user"></i> My Profile</a></li>
+                </ul>
+            </nav>
+            <div class="logout-container">
+                <a href="/index/" class="logout-link"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <h2>Teacher's Dashboard</h2>
+                <div class="user-profile">
+                   
+                    <div class="user-info">
+                        {% if user.image %}
+                            <img src="{{ user.image.url }}" alt="{{ user.name }}">
+                        {% else %}
+                            <img src="https://ui-avatars.com/api/?name={{ user.name|default:'Teacher' }}&background=0D8ABC&color=fff" alt="Profile">
+                        {% endif %}
+                        <span>{{ user.name }} <i class="fa-solid fa-chevron-down" style="font-size: 0.8rem; margin-left: 5px;"></i></span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                
+                <div class="left-column">
+                    <div class="stats-row">
+                        <div class="card stat-card blue-bg">
+                            <div class="card-header"><h3>Total Students</h3></div>
+                            <div class="stat-value">{{ total_students }}</div>
+                            <div class="mini-chart">
+                                <div class="bar" style="height: 40%"></div><div class="bar" style="height: 60%"></div>
+                                <div class="bar" style="height: 30%"></div><div class="bar" style="height: 80%"></div>
+                                <div class="bar" style="height: 50%"></div><div class="bar" style="height: 90%"></div>
+                            </div>
+                        </div>
+                        <div class="card stat-card green-bg">
+                            <div class="card-header"><h3>Active Lectures</h3></div>
+                            <div class="stat-value">{{ active_lectures }}</div>
+                            <div class="mini-chart">
+                                <div class="bar" style="height: 30%"></div><div class="bar" style="height: 50%"></div>
+                                <div class="bar" style="height: 70%"></div><div class="bar" style="height: 40%"></div>
+                                <div class="bar" style="height: 60%"></div><div class="bar" style="height: 30%"></div>
+                            </div>
+                        </div>
+                        <div class="card stat-card mint-bg">
+                            <div class="card-header"><h3>Avg. Engagement Score</h3></div>
+                            <div class="stat-value">{{ avg_engagement }}%</div>
+                            <div class="mini-chart">
+                                <div class="bar" style="height: 50%"></div><div class="bar" style="height: 70%"></div>
+                                <div class="bar" style="height: 90%"></div><div class="bar" style="height: 60%"></div>
+                                <div class="bar" style="height: 80%"></div><div class="bar" style="height: 95%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card content-gen-section">
+                        <div class="section-header">
+                            <h3>Recent AI Content Generation</h3>
+                            <a href="/teachercontentlib/" class="btn-outline">View All Uploads</a>
+                        </div>
+                        <div class="file-list">
+                            {% for file in recent_files %}
+                            <div class="file-item">
+                                <div class="file-icon {% if '.pdf' in file.file.url %}pdf-icon{% elif '.mp4' in file.file.url %}video-icon{% else %}audio-icon{% endif %}">
+                                    {% if '.pdf' in file.file.url %} <i class="fa-solid fa-file-lines"></i>
+                                    {% elif '.mp4' in file.file.url %} <i class="fa-solid fa-play"></i>
+                                    {% else %} <i class="fa-solid fa-volume-high"></i> {% endif %}
+                                </div>
+                                <div class="file-details">
+                                    <span class="file-name">{{ file.title }}</span>
+                                    <div class="progress-bar"><div class="fill green-fill" style="width: 100%"></div></div>
+                                </div>
+                                <div class="file-status status-ready"><i class="fa-solid fa-circle-check"></i> Ready</div>
+                                <div class="file-menu"><i class="fa-solid fa-ellipsis-vertical"></i></div>
+                            </div>
+                            {% empty %}
+                            <div class="file-item" style="justify-content:center; color:var(--text-light);">No recent uploads.</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="right-column">
+                    <div class="card insights-card">
+                        <div class="section-header"><h3>Learning Style Insights</h3></div>
+                        <div class="chart-container">
+                            <div class="pie-chart" style="background: {{ pie_style }};"></div>
+                            <div class="legend">
+                                <div class="legend-item"><span class="dot blue"></span> Visual: {{ style_stats.v }}%</div>
+                                <div class="legend-item"><span class="dot green"></span> Auditory: {{ style_stats.a }}%</div>
+                                <div class="legend-item"><span class="dot gray"></span> Textual: {{ style_stats.t }}%</div>
+                                <div class="legend-item"><span class="dot orange"></span> Kinesthetic: {{ style_stats.k }}%</div>
+                            </div>
+                        </div>
+                        <a href="/teacherstanaly/" class="btn-primary">View Detailed Report</a>
+                    </div>
+
+                    <div class="card watchlist-card">
+                        <div class="watchlist-header">
+                            <h3 style="font-size:1rem; font-weight:600; margin:0;">Student Performance (Monitor)</h3>
+                        </div>
+                        
+                        <div class="watchlist-scroll">
+                            <table class="watchlist-table">
+                                {% for student in watchlist %}
+                                <tr>
+                                    <td><span style="font-weight:600;">{{ student.name }}</span></td>
+                                    <td>
+                                        <div class="flag {{ student.flag_class }}">
+                                            <i class="fa-solid {{ student.icon }}"></i> {{ student.flag_text }}
+                                        </div>
+                                    </td>
+                                    <td class="action" style="text-align: right;">
+                                        <button class="btn-check" onclick="openStudentGraph('{{ student.name }}', {{ student.chart_data }})">Check</button>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="3" style="text-align:center; color: var(--text-light); padding:10px;">No students enrolled yet.</td></tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="studentGraphModal">
+        <div class="modal-box" style="width: 500px;">
+            <i class="fa-solid fa-xmark close-modal" onclick="closeStudentGraph()"></i>
+            <h2 id="modalStudentName" style="text-align:left; font-size:1.2rem; margin-bottom:15px;">Student Analysis</h2>
+            <p style="text-align:left; font-size:0.9rem; margin-bottom:10px;">Recent Quiz Performance (Last 5)</p>
+            <div style="height: 250px; width: 100%;">
+                <canvas id="studentPerformanceChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="logout-modal">
+        <div class="modal-box">
+            <h2>Confirm Logout</h2>
+            <p>Are you sure you want to log out?</p>
+            <div class="modal-buttons">
+                <button class="btn btn-confirm" id="confirm-logout">Yes</button>
+                <button class="btn btn-cancel" id="cancel-logout">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- STUDENT MONITORING CHART ---
+        let chartInstance = null;
+
+        function openStudentGraph(name, dataPoints) {
+            document.getElementById('modalStudentName').innerText = name + " - Performance";
+            
+            const ctx = document.getElementById('studentPerformanceChart').getContext('2d');
+            
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'],
+                    datasets: [{
+                        label: 'Score (out of 5)',
+                        data: dataPoints,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#1d4ed8'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, max: 5 }
+                    }
+                }
+            });
+
+            document.getElementById('studentGraphModal').style.display = 'flex';
+        }
+
+        function closeStudentGraph() {
+            document.getElementById('studentGraphModal').style.display = 'none';
+        }
+
+        // --- LOGOUT LOGIC ---
+        const logoutLink = document.querySelector(".logout-link");
+        const modal = document.getElementById("logout-modal");
+        const confirmBtn = document.getElementById("confirm-logout");
+        const cancelBtn = document.getElementById("cancel-logout");
+
+        if(logoutLink){
+            logoutLink.addEventListener("click", function(event) {
+                event.preventDefault();
+                modal.style.display = "flex";
+            });
+        }
+        if(confirmBtn){
+            confirmBtn.addEventListener("click", function() {
+                window.location.href = logoutLink.getAttribute("href");
+            });
+        }
+        if(cancelBtn){
+            cancelBtn.addEventListener("click", function() {
+                modal.style.display = "none";
+            });
+        }
+        
+        // Close modals on outside click
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

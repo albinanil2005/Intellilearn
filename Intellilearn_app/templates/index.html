@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntelliLearn - AI Personalized Learning</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --primary-dark: #0f172a;    /* Dark Navy */
+            --primary-blue: #1e40af;    /* Button Blue */
+            --accent-gold: #d97706;     /* Button Gold/Tan */
+            --text-grey: #4b5563;
+            --bg-light: #f8fafc;
+            --white: #ffffff;
+            --max-width: 1200px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--white);
+            color: var(--primary-dark);
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- HEADER / NAVIGATION --- */
+        header {
+            background: var(--white);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--primary-blue);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        /* --- NEW HOVER EFFECTS FOR TEXT LINKS --- */
+        /* Targets Features and Contact (any link that is NOT a button) */
+        .nav-links a:not(.btn) {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-grey);
+            transition: all 0.3s ease;
+            position: relative; /* Essential for the underline placement */
+        }
+
+        /* 1. Lift and Color Change on Hover */
+        .nav-links a:not(.btn):hover {
+            color: var(--primary-blue);
+            transform: translateY(-2px); /* Moves text up slightly */
+        }
+
+        /* 2. The Animated Underline */
+        .nav-links a:not(.btn)::after {
+            content: '';
+            position: absolute;
+            width: 0;           /* Start with 0 width (invisible) */
+            height: 2px;        /* Thickness of the line */
+            bottom: -4px;       /* Distance from text */
+            left: 0;
+            background-color: var(--primary-blue);
+            transition: width 0.3s ease; /* Animate the width */
+        }
+
+        /* Expand the line on hover */
+        .nav-links a:not(.btn):hover::after {
+            width: 100%;
+        }
+
+
+        /* Specific styles for Buttons inside Navbar */
+        .nav-links .btn {
+            padding: 10px 20px;
+            font-size: 0.85rem;
+            color: var(--white);
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            padding: 80px 0;
+            background-color: var(--bg-light);
+        }
+
+        .hero-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+
+        .hero-content {
+            flex: 1;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            color: var(--primary-dark);
+        }
+
+        .hero-content p {
+            font-size: 1.1rem;
+            color: var(--text-grey);
+            margin-bottom: 30px;
+            max-width: 450px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* --- BUTTON STYLES (Shared) --- */
+        .btn {
+            padding: 12px 30px;
+            border-radius: 50px; /* Pill shape */
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn-student {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+
+        .btn-teacher {
+            background-color: #c29b40;
+            color: var(--white);
+        }
+
+        .hero-image {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            overflow: hidden; 
+            border-radius: 10px;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            object-fit: cover; 
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        /* --- FEATURES SECTION --- */
+        .features {
+            padding: 80px 0;
+            background: var(--white);
+            text-align: center;
+        }
+
+        .features h2 {
+            font-size: 1.8rem;
+            margin-bottom: 50px;
+            color: var(--primary-dark);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            text-align: left;
+        }
+
+        .feature-card {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .icon-box {
+            font-size: 2rem;
+            color: var(--primary-dark);
+            flex-shrink: 0;
+        }
+
+        .feature-text h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .feature-text p {
+            font-size: 0.95rem;
+            color: var(--text-grey);
+            line-height: 1.5;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            padding: 40px 0;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-nav a {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            transition: color 0.3s;
+        }
+
+        .footer-nav a:hover {
+            color: var(--white);
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-icons a {
+            width: 35px;
+            height: 35px;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .social-icons a:hover {
+            background: var(--primary-blue);
+        }
+
+        /* --- RESPONSIVE DESIGN --- */
+        @media (max-width: 768px) {
+            .hero-wrapper {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .hero-content p {
+                margin: 0 auto 30px auto;
+            }
+
+            .cta-buttons {
+                justify-content: center;
+            }
+
+            .nav-links {
+                display: none; /* Hidden on mobile */
+            }
+            
+            .hero-image {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    IntelliLearn
+                </a>
+                <ul class="nav-links">
+                    <li><a href="/features/">Features</a></li>
+                    
+                    <li>
+                        <a href="/login/" class="btn btn-student">
+                            Student Login
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a href="/TeacherLogin/" class="btn btn-teacher">
+                            Teacher Login
+                        </a>
+                    </li>
+                    
+                    <li><a href="/adminlogin/">Admin</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-wrapper">
+                <div class="hero-content">
+                    <h1>Unlock Your Potential with AI-Personalized Learning</h1>
+                    <p>The intelligent platform that adapts to your unique learning style. Enhance your education with data-driven insights.</p>
+                    <div class="cta-buttons">
+                        <a href="/register/" class="btn btn-student">STUDENT REGISTER</a>
+                        <a href="/TeacherReg/"class="btn btn-teacher">TEACHER REGISTER</a>
+                    </div>
+                </div>
+
+                <div class="hero-image">
+                    <img src="https://media.istockphoto.com/id/1460535745/photo/e-learning-graduate-certificate-program-concept-lightbulb-on-the-book-with-graduation-hat-and.jpg?s=612x612&w=0&k=20&c=wjNyV1J_cA-C0p5EiybWbSa-FzTA8YQmvOazDI7uB8g=" alt="Students and teacher with tablets in a classroom">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <h2>Why Choose IntelliLearn?</h2>
+            <div class="feature-grid">
+                
+                <div class="feature-card">
+                    <div class="icon-box">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="feature-text">
+                        <h3>AI-Driven Insights</h3>
+                        <p>Analytics to improve learning outcomes by identifying strengths and weaknesses instantly.</p>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="icon-box">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="feature-text">
+                        <h3>Adaptive Content</h3>
+                        <p>Flexible materials that change format based on your visual or textual preferences.</p>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="icon-box">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="feature-text">
+                        <h3>Real-time Analytics</h3>
+                        <p>Progress tracking to visualize your improvement and help teachers intervene early.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo" style="color: white; font-size: 1.2rem;">
+                    <i class="fas fa-graduation-cap"></i>
+                    IntelliLearn
+                </div>
+                
+               
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

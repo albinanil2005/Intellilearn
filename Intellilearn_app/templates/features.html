@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntelliLearn - Features</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- CSS VARIABLES & RESET (Matches Index) --- */
+        :root {
+            --primary-dark: #0f172a;    /* Dark Navy */
+            --primary-blue: #1e40af;    /* Button Blue */
+            --accent-gold: #d97706;     /* Button Gold/Tan */
+            --text-grey: #4b5563;
+            --bg-light: #f8fafc;
+            --white: #ffffff;
+            --max-width: 1200px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--white);
+            color: var(--primary-dark);
+            line-height: 1.6;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 20px; }
+
+        /* --- HEADER / NAVIGATION (Matches Index) --- */
+        header {
+            background: var(--white);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        nav { display: flex; justify-content: space-between; align-items: center; }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo i { color: var(--primary-blue); }
+
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+
+        .nav-links a:not(.btn) {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-grey);
+            transition: color 0.3s ease;
+        }
+        .nav-links a:not(.btn):hover { color: var(--primary-blue); }
+
+        /* Navbar Buttons */
+        .nav-links .btn { padding: 10px 20px; font-size: 0.85rem; color: var(--white); }
+
+        /* --- PAGE HEADER --- */
+        .page-header {
+            background-color: var(--bg-light);
+            padding: 60px 0;
+            text-align: center;
+        }
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+        }
+        .page-header p {
+            color: var(--text-grey);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* --- FEATURE ROWS (Zig-Zag Layout) --- */
+        .feature-section { padding: 80px 0; }
+
+        .feature-row {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            margin-bottom: 100px;
+        }
+
+        /* Reverse direction for every even row */
+        .feature-row:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .feature-text { flex: 1; }
+
+        .feature-text h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--primary-dark);
+        }
+
+        .feature-text p {
+            color: var(--text-grey);
+            font-size: 1rem;
+            margin-bottom: 25px;
+        }
+
+        .feature-list { margin-bottom: 25px; }
+        .feature-list li {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-grey);
+        }
+        .feature-list i { color: var(--success, #10b981); }
+
+        .feature-visual {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Styling for the visual placeholder boxes */
+        .visual-box {
+            width: 100%;
+            height: 350px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Decorative circle behind icons */
+        .visual-circle {
+            width: 150px;
+            height: 150px;
+            background: #eff6ff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 4rem;
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+        }
+
+        /* --- CTA SECTION --- */
+        .cta-section {
+            background-color: var(--primary-dark);
+            color: white;
+            text-align: center;
+            padding: 80px 0;
+        }
+        .cta-section h2 { margin-bottom: 20px; }
+        .cta-section p { margin-bottom: 30px; opacity: 0.8; }
+
+        /* --- BUTTON STYLES --- */
+        .btn {
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-student { background-color: var(--primary-dark); color: var(--white); }
+        .btn-teacher {background-color: #c29b40; color: var(--white); }
+
+        /* --- FOOTER (Matches Index) --- */
+        footer {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            padding: 40px 0;
+        }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+        .footer-nav { display: flex; gap: 20px; }
+        .footer-nav a { color: #cbd5e1; font-size: 0.9rem; }
+        .social-icons { display: flex; gap: 15px; }
+        .social-icons a {
+            width: 35px; height: 35px; background: rgba(255,255,255,0.1);
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .feature-row, .feature-row:nth-child(even) { flex-direction: column; text-align: center; gap: 30px; }
+            .feature-list li { justify-content: center; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="/index/" class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    IntelliLearn
+                </a>
+                <ul class="nav-links">
+                    <li><a href="/features/" style="color: var(--primary-blue);">Features</a></li>
+                    <li>
+                        <a href="/login/" class="btn btn-student">Student Login</a>
+                    </li>
+                    <li>
+                        <a href="/TeacherLogin/" class="btn btn-teacher">Teacher Login</a>
+                    </li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>Powerful Features for Modern Learning</h1>
+            <p>Discover how IntelliLearn uses Artificial Intelligence to bridge the gap between teaching and understanding.</p>
+        </div>
+    </section>
+
+    <section class="feature-section">
+        <div class="container">
+
+            <div class="feature-row">
+                <div class="feature-text">
+                    <h2>Adaptive Learning Styles</h2>
+                    <p>Every student is unique. Our AI analyzes your interactions to determine if you are a Visual, Auditory, or Textual learner and adapts the content accordingly.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> VAK Model Assessment</li>
+                        <li><i class="fas fa-check-circle"></i> Personalized Content Recommendations</li>
+                        <li><i class="fas fa-check-circle"></i> Dynamic Study Paths</li>
+                    </ul>
+                    <a href="#" style="color: var(--primary-blue); font-weight: 600;">Learn more &rarr;</a>
+                </div>
+                <div class="feature-visual">
+                    <div class="visual-box">
+                        <div class="visual-circle"><i class="fas fa-shapes"></i></div>
+                        <h3 style="color:#1e40af">Personalized Content</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-text">
+                    <h2>Smart Teacher Dashboard</h2>
+                    <p>Empower educators with real-time insights. Track student engagement, identify at-risk students early, and generate course materials instantly.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Real-time Attendance & Engagement</li>
+                        <li><i class="fas fa-check-circle"></i> Automated Quiz Generation</li>
+                        <li><i class="fas fa-check-circle"></i> Student Performance Watchlist</li>
+                    </ul>
+                    <a href="#" style="color: var(--primary-blue); font-weight: 600;">Explore Dashboard &rarr;</a>
+                </div>
+                <div class="feature-visual">
+                    <div class="visual-box">
+                        <div class="visual-circle" style="background:#fff7ed; color:var(--accent-gold);"><i class="fas fa-chalkboard-teacher"></i></div>
+                        <h3 style="color:var(--accent-gold)">Actionable Analytics</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-row">
+                <div class="feature-text">
+                    <h2>AI Content Generation</h2>
+                    <p>Stop spending hours creating notes. Upload your raw lecture data, and IntelliLearn will automatically generate structured notes, video summaries, and audio podcasts.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Text-to-Video conversion</li>
+                        <li><i class="fas fa-check-circle"></i> Auto-summarization of PDFs</li>
+                        <li><i class="fas fa-check-circle"></i> Instant Podcast creation for revision</li>
+                    </ul>
+                    <a href="#" style="color: var(--primary-blue); font-weight: 600;">See Magic Tools &rarr;</a>
+                </div>
+                <div class="feature-visual">
+                    <div class="visual-box">
+                        <div class="visual-circle" style="background:#f0fdf4; color:#10b981;"><i class="fas fa-magic"></i></div>
+                        <h3 style="color:#10b981">Instant Generation</h3>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Transform Education?</h2>
+            <p>Join hundreds of students and teachers using IntelliLearn today.</p>
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <a class="btn" href="/register/" style="background: white; color: var(--primary-dark);">Get Started Now</a>
+            </div>
+        </div>
+    </section>
+
+    
+
+</body>
+</html>

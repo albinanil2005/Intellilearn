@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Courses - IntelliLearn</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- CSS VARIABLES --- */
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-sidebar: #ffffff;
+            --primary-dark: #0f172a;
+            --primary-blue: #2563EB;
+            --text-main: #1f2937;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            z-index: 10;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-left: 5px;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        
+        .logo-text i { color: var(--primary-blue); }
+
+        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+        .nav-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            color: var(--text-muted); text-decoration: none;
+            border-radius: var(--radius-md); transition: all 0.2s ease; font-weight: 500;
+        }
+
+        .nav-item:hover { background-color: #f1f5f9; color: var(--primary-blue); }
+
+        .nav-item.active {
+            background-color: var(--primary-blue); color: white;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+        }
+
+        .logout-container {
+            margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color);
+        }
+        .logout-container .nav-item:hover { background-color: #fef2f2; color: var(--danger) !important; }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            flex: 1; display: flex; flex-direction: column; overflow: hidden;
+            background-color: var(--bg-body);
+        }
+
+        header {
+            height: 80px; border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 32px; background: var(--bg-card);
+        }
+
+        .header-title h2 { font-size: 20px; font-weight: 600; color: var(--primary-dark); }
+        
+        .profile-section {
+            display: flex; align-items: center; gap: 12px; padding-left: 24px; border-left: 1px solid var(--border-color);
+        }
+        
+        .avatar {
+            width: 40px; height: 40px; border-radius: 50%; background-color: #cbd5e1; overflow: hidden;
+            border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* --- COURSES PAGE SPECIFIC STYLES --- */
+        .courses-body {
+            padding: 32px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .controls-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 32px; flex-wrap: wrap; gap: 16px;
+        }
+
+        .search-box { position: relative; width: 350px; }
+
+        .search-box input {
+            width: 100%;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 12px 12px 12px 40px;
+            border-radius: var(--radius-md);
+            color: var(--primary-dark);
+            font-size: 14px;
+            outline: none;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .search-box input:focus { border-color: var(--primary-blue); }
+
+        .search-icon {
+            position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .filter-tabs {
+            display: flex;
+            background-color: var(--bg-card);
+            padding: 6px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            gap: 4px;
+        }
+
+        .filter-tab {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: transparent;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        .filter-tab:hover {
+            color: var(--primary-blue);
+            background-color: rgba(37, 99, 235, 0.05);
+            transform: translateY(-1px);
+        }
+
+        .filter-tab.active {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            color: var(--primary-blue);
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+            border: 1px solid #bfdbfe;
+        }
+
+        .filter-tab.active::after {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            margin-left: 4px;
+        }
+
+        /* --- AI CONVERTER SECTION STYLES --- */
+        .ai-converter-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+            border: 1px solid #bfdbfe;
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .ai-header {
+            display: flex; align-items: center; gap: 12px;
+        }
+
+        .ai-icon-box {
+            width: 40px; height: 40px; background: var(--primary-blue); color: white;
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+
+        .ai-title h3 { font-size: 16px; font-weight: 700; color: var(--primary-dark); }
+        .ai-title p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+        .converter-form {
+            display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+            background: rgba(255,255,255,0.6); padding: 16px; border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .converter-select {
+            flex: 1; padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border-color);
+            min-width: 150px; color: var(--text-main); font-size: 14px; outline: none;
+        }
+
+        .custom-file-btn {
+            padding: 10px 15px;
+            border: 1px dashed var(--primary-blue);
+            border-radius: 8px;
+            background: white;
+            color: var(--primary-blue);
+            font-size: 13px; font-weight: 500;
+            cursor: pointer; display: flex; align-items: center; gap: 8px;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .custom-file-btn:hover { background: #eff6ff; }
+
+        .format-options {
+            display: flex; gap: 10px; flex: 2;
+        }
+
+        .format-radio { display: none; }
+        
+        .format-label {
+            flex: 1; text-align: center; padding: 10px; border: 1px solid var(--border-color);
+            border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 13px; font-weight: 500;
+            background: white; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 6px;
+            white-space: nowrap;
+        }
+
+        .format-radio:checked + .format-label {
+            background-color: #eff6ff; border-color: var(--primary-blue); color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-convert {
+            padding: 12px 24px; background: var(--primary-blue); color: white; border: none;
+            border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; gap: 8px; font-size: 14px; white-space: nowrap;
+        }
+        .btn-convert:hover { background: #1d4ed8; transform: translateY(-1px); }
+
+        /* Grid Layout */
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .course-card-lg {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: transform 0.2s, border-color 0.2s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .course-card-lg:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary-blue);
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-thumb {
+            height: 160px;
+            width: 100%;
+            background-color: #e2e8f0;
+            position: relative;
+        }
+
+        .card-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+        .ai-badge {
+            position: absolute;
+            top: 12px; right: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(4px);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .badge-video { color: #2563EB; border: 1px solid #bfdbfe; }
+        .badge-text { color: #7c3aed; border: 1px solid #ddd6fe; }
+        .badge-audio { color: #db2777; border: 1px solid #fbcfe8; }
+
+        .card-content {
+            padding: 20px;
+            display: flex; flex-direction: column; flex: 1;
+        }
+
+        .course-cat {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .course-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            line-height: 1.4;
+            color: var(--primary-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-summary-scroll {
+            margin-top: auto;
+            background: #f8fafc;
+            border-left: 3px solid var(--primary-blue);
+            padding: 10px;
+            border-radius: 0 6px 6px 0;
+            height: 80px;
+            overflow-y: auto;
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        
+        .card-summary-scroll strong { display:block; color: var(--primary-blue); margin-bottom: 4px; }
+
+        .card-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            background: #f8fafc;
+        }
+
+        .instructor {
+            display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); font-weight: 500;
+        }
+        .instructor-avatar { width: 24px; height: 24px; border-radius: 50%; background: #cbd5e1; object-fit:cover; }
+
+        .action-btn {
+            padding: 8px 16px;
+            background-color: var(--primary-dark);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .action-btn:hover { background-color: var(--primary-blue); }
+        
+        .empty-message {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px dashed var(--border-color);
+        }
+
+        /* --- AUDIO & VIDEO LIST STYLES (NEW) --- */
+        .audio-list-container {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #fff0f7; /* Very light pink/purple background */
+            border-radius: var(--radius-lg);
+            border: 1px solid #fbcfe8;
+        }
+
+        .audio-card-sm {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #fce7f3;
+            transition: transform 0.2s;
+        }
+
+        /* Video specific layout (Stack vertically) */
+        .video-layout {
+            display: block; 
+        }
+
+        .audio-card-sm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        .audio-icon-circle {
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            background: #fdf2f8;
+            color: #db2777;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .audio-info { flex: 1; }
+        
+        .audio-title {
+            font-size: 15px; font-weight: 600; color: var(--primary-dark);
+            margin-bottom: 5px;
+        }
+
+        .audio-player-sm {
+            width: 100%; height: 32px; margin-top: 5px;
+        }
+
+        /* New Download Button Style */
+        .btn-download-sm {
+            color: var(--text-muted);
+            font-size: 16px;
+            padding: 8px;
+            transition: 0.2s;
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+        .btn-download-sm:hover {
+            color: var(--primary-blue);
+            transform: scale(1.1);
+        }
+
+        /* --- AI RESULT MODAL --- */
+        .ai-result-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 3000;
+        }
+        .ai-result-box {
+            background: white; width: 90%; max-width: 700px; max-height: 85vh;
+            border-radius: var(--radius-lg); padding: 30px;
+            display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .ai-result-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color); padding-bottom: 15px;
+        }
+        .ai-result-content {
+            overflow-y: auto; flex: 1; font-size: 15px; line-height: 1.6;
+            color: var(--text-main); white-space: pre-line; background: #f8fafc;
+            padding: 20px; border-radius: 8px; border: 1px solid var(--border-color);
+        }
+        .close-ai-btn {
+            background: var(--primary-blue); color: white; border: none; padding: 8px 20px;
+            border-radius: 6px; cursor: pointer; margin-top: 20px; align-self: flex-end;
+        }
+
+        /* --- Logout Modal --- */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.5);
+            justify-content: center; align-items: center; z-index: 2000;
+        }
+        .modal-box {
+            background: var(--bg-card); padding: 24px; border-radius: var(--radius-lg);
+            width: 320px; text-align: center; box-shadow: var(--shadow-md); animation: fadeIn 0.3s ease;
+        }
+        .modal-box h2 { margin-bottom: 12px; font-size: 18px; color: var(--primary-dark); }
+        .modal-box p { margin-bottom: 20px; color: var(--text-muted); }
+        .modal-buttons { display: flex; justify-content: space-around; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; }
+        .btn-confirm { background: var(--danger); color: #fff; }
+        .btn-cancel { background: #e5e7eb; color: var(--primary-dark); }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo-container">
+            <a href="#" class="logo-text">
+                <i class="fas fa-graduation-cap"></i>
+                IntelliLearn
+            </a>
+        </div>
+
+        <ul class="nav-menu">
+            <li><a href="/studentdashboard/" class="nav-item"><span>📊</span> Dashboard</a></li>
+            <li><a href="/studentcourses/" class="nav-item active"><span>📚</span> My Courses</a></li>
+            <li><a href="/studentquiz/" class="nav-item"><span>📝</span> Quiz</a></li> 
+            <li><a href="/studenttimetable/" class="nav-item"><span>📅</span> Timetable</a></li>
+            <li><a href="/studentachievements/" class="nav-item"><span>🏆</span> Achievements</a></li>
+             <li><a href="/studentprofile/" class="nav-item">
+                <span>👤</span> My Profile
+            </a></li>
+        </ul>
+        
+        <div class="logout-container">
+            <a href="/index/" class="nav-item" style="color: var(--text-muted);"><span>🚪</span> Logout</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        
+        <header>
+            <div class="header-title">
+                <h2>My Course Library</h2>
+            </div>
+            
+            <div class="profile-section">
+                <div style="text-align: right;">
+                    <div style="font-weight: 600; font-size: 14px; color: var(--primary-dark);">{{ user.name }}</div>
+                </div>
+                <div class="avatar">
+
+                    {% if user.image %}
+                        <img src="{{ user.image.url }}" alt="User">
+                    {% else %}
+                        <img src="https://ui-avatars.com/api/?name={{ user.name }}&background=2563EB&color=fff" alt="User">
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+
+        <div class="courses-body">
+            
+            <div class="controls-bar">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" placeholder="Search your courses...">
+                </div>
+
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all"><i class="fas fa-th-large"></i> All Courses</button>
+                    <button class="filter-tab" data-filter="audio"><i class="fas fa-headphones"></i> Audio</button>
+                    <button class="filter-tab" data-filter="video"><i class="fas fa-video"></i> Videos</button>
+                    <button class="filter-tab" data-filter="text"><i class="fas fa-file-lines"></i> Text</button>
+                </div>
+            </div>
+
+            <div class="ai-converter-section">
+                <div class="ai-header">
+                    <div class="ai-icon-box"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <div class="ai-title">
+                        <h3>AI Format Converter</h3>
+                        <p>Automatically convert course material into your preferred learning style.</p>
+                    </div>
+                </div>
+                
+                <form method="POST" enctype="multipart/form-data" class="converter-form" id="convertForm">
+                    {% csrf_token %}
+                    
+                    <select class="converter-select" name="course_content_id">
+                        <option value="" disabled selected>Select a Course or Module...</option>
+                        {% for item in contents %}
+                        <option value="{{ item.id }}">{{ item.title }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <div style="font-weight: 600; color: var(--text-muted); font-size: 12px; text-transform: uppercase;">OR</div>
+
+                    <label for="student-upload" class="custom-file-btn">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload File
+                    </label>
+                    <input type="file" id="student-upload" name="student_file" style="display:none;">
+                    <span id="file-name-display" style="font-size: 12px; color: var(--text-muted); max-width: 100px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"></span>
+
+                    <div style="color: var(--text-muted); font-size: 14px; margin-left: 10px;">Convert To:</div>
+
+                    <div class="format-options">
+                        <input type="radio" name="format" id="fmt-video" value="video" class="format-radio" required>
+                        <label for="fmt-video" class="format-label"><i class="fa-solid fa-video"></i> Video Script</label>
+
+                        <input type="radio" name="format" id="fmt-audio" value="audio" class="format-radio">
+                        <label for="fmt-audio" class="format-label"><i class="fa-solid fa-headphones"></i> Podcast</label>
+
+                        <input type="radio" name="format" id="fmt-text" value="text" class="format-radio">
+                        <label for="fmt-text" class="format-label"><i class="fa-solid fa-file-lines"></i> Study Notes</label>
+                    </div>
+
+                    <button type="submit" class="btn-convert">
+                        <i class="fa-solid fa-bolt"></i> Convert Now
+                    </button>
+                </form>
+
+                <div id="conversion-progress" style="display: none; width: 100%; margin-top: 15px;">
+                    <div style="width: 100%; background: #e2e8f0; border-radius: 10px; height: 10px; overflow: hidden;">
+                        <div id="p-bar-fill" style="width: 0%; height: 100%; background: var(--primary-blue); transition: width 0.4s;"></div>
+                    </div>
+                    <div id="p-text" style="text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 5px;">Initializing...</div>
+                </div>
+
+            </div>
+
+            {% if video_notes %}
+            <div class="audio-list-container" style="background-color: #eff6ff; border-color: #bfdbfe;">
+                <h3 style="font-size: 18px; color: var(--primary-dark); margin-bottom: 15px; display:flex; align-items:center; gap:10px;">
+                    <i class="fas fa-video" style="color: #2563EB;"></i> Generated Video Lectures
+                </h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;">
+                    {% for note in video_notes %}
+                    <div class="audio-card-sm video-layout" style="border-color: #dbeafe;">
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                            <div class="audio-icon-circle" style="background: #dbeafe; color: #2563EB;">
+                                <i class="fas fa-film"></i>
+                            </div>
+                            <div class="audio-info">
+                                <div class="audio-title">{{ note.title }}</div>
+                                <div style="font-size: 12px; color: var(--text-muted);">
+                                    AI Generated Lecture
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="width: 100%;">
+                            <video width="100%" height="200" controls style="border-radius: 8px; background-color: #000;">
+                                <source src="/{{ note.content }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div style="text-align: right; margin-top: 5px;">
+                                <a href="/{{ note.content }}" download class="btn-download-sm" title="Download Video">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if audio_notes %}
+            <div class="audio-list-container">
+                <h3 style="font-size: 18px; color: var(--primary-dark); margin-bottom: 15px; display:flex; align-items:center; gap:10px;">
+                    <i class="fas fa-podcast" style="color: #db2777;"></i> Generated Audio Notes
+                </h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;">
+                    {% for note in audio_notes %}
+                    <div class="audio-card-sm">
+                        <div class="audio-icon-circle">
+                            <i class="fas fa-headphones"></i>
+                        </div>
+                        <div class="audio-info">
+                            <div class="audio-title">{{ note.title }}</div>
+                            <audio controls class="audio-player-sm" preload="metadata">
+                                <source src="/{{ note.content }}" type="audio/mpeg">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+                        <a href="/{{ note.content }}" download class="btn-download-sm" title="Download Audio">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="courses-grid" id="coursesGrid">
+                
+                {% for item in contents %}
+                <div class="course-card-lg">
+                    <div class="card-thumb">
+                        {% if '.pdf' in item.file.url or '.txt' in item.file.url %}
+                            <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Book">
+                            <div class="ai-badge badge-text"><span>📄</span> AI Analyzed</div>
+                        {% elif '.mp4' in item.file.url or '.mov' in item.file.url %}
+                            <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Video">
+                            <div class="ai-badge badge-video"><span>🎥</span> AI Analyzed</div>
+                        {% else %}
+                             <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Course">
+                             <div class="ai-badge badge-audio"><span>📁</span> AI Analyzed</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="card-content">
+                        <div class="course-cat">
+                            {% if '.pdf' in item.file.url or '.txt' in item.file.url %}Text
+                            {% elif '.mp4' in item.file.url or '.mov' in item.file.url %}Video
+                            {% elif '.mp3' in item.file.url or '.wav' in item.file.url %}Audio
+                            {% else %}Text{% endif %}
+                        </div>
+                        <div class="course-title">{{ item.title }}</div>
+                        
+                        <div class="card-summary-scroll">
+                            <strong><i class="fa-solid fa-robot"></i> AI Summary:</strong>
+                            {{ item.ai_summary|linebreaksbr }}
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer">
+                        <div class="instructor">
+                             {% if item.teacher.image %}
+                                <img src="{{ item.teacher.image.url }}" class="instructor-avatar">
+                             {% else %}
+                                <div class="instructor-avatar"></div>
+                             {% endif %}
+                            Prof. {{ item.teacher.name }}
+                        </div>
+                        
+                        {% if 'ai_generated.pdf' in item.file.url %}
+                            <a href="/take_quiz/{{ item.id }}/" class="action-btn" style="background-color: var(--warning); color: #000;">
+                                <i class="fa-solid fa-clipboard-check"></i> Take Quiz
+                            </a>
+                        {% else %}
+                            <a href="{{ item.file.url }}" target="_blank" class="action-btn">View File</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-message">
+                    <h3>No courses found.</h3>
+                    <p>Ask your teachers to upload content!</p>
+                </div>
+                {% endfor %}
+                </div>
+        </div>
+    </main>
+
+<div class="ai-result-overlay" id="aiResultModal">
+    <div class="ai-result-box">
+        <div class="ai-result-header">
+            <h3 style="color: var(--primary-dark); display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-robot" style="color: var(--primary-blue);"></i> 
+                AI Generated: {{ conversion_format }}
+            </h3>
+            <button onclick="closeAiModal()" style="background: none; border: none; font-size: 20px; cursor: pointer;">&times;</button>
+        </div>
+        
+        <div class="ai-result-content">
+            {% if audio_b64 %}
+                <div style="margin-bottom: 20px; padding: 15px; background: #eff6ff; border-radius: 8px; border: 1px solid #bfdbfe;">
+                    <h4 style="margin-top: 0; color: var(--primary-blue); font-size: 14px; margin-bottom: 10px; font-weight: 600;">
+                        <i class="fa-solid fa-headphones"></i> Listen to Audio
+                    </h4>
+                    <audio controls style="width: 100%; height: 40px;">
+                        <source src="data:audio/mp3;base64,{{ audio_b64 }}" type="audio/mp3">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+                <hr style="border: 0; border-top: 1px solid var(--border-color); margin-bottom: 20px;">
+            {% endif %}
+
+            {{ conversion_result|linebreaksbr }}
+        </div>
+        
+        <button class="close-ai-btn" onclick="closeAiModal()">Close Result</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="logout-modal">
+  <div class="modal-box">
+    <h2>Confirm Logout</h2>
+    <p>Are you sure you want to log out?</p>
+    <div class="modal-buttons">
+      <button class="btn btn-confirm" id="confirm-logout">Yes</button>
+      <button class="btn btn-cancel" id="cancel-logout">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM loaded, initializing filters...');
+  
+  // --- SEARCH AND FILTER LOGIC WITH DEBUGGING ---
+  const searchInput = document.querySelector('.search-box input');
+  const filterTabs = document.querySelectorAll('.filter-tab');
+  const coursesGrid = document.getElementById('coursesGrid');
+  
+  let currentFilter = 'all';
+
+  // Helper function to get course type from card
+  function getCourseType(card) {
+      try {
+          const categoryEl = card.querySelector('.course-cat');
+          if (!categoryEl) return 'unknown';
+          
+          const categoryText = categoryEl.innerText.trim().toLowerCase();
+          console.log('Course category:', categoryText);
+          
+          if (categoryText.includes('video')) return 'video';
+          if (categoryText.includes('audio')) return 'audio';
+          if (categoryText.includes('text') || categoryText.includes('document')) return 'text';
+          return 'text';
+      } catch(e) {
+          console.error('Error getting course type:', e);
+          return 'unknown';
+      }
+  }
+
+  // Helper function to apply filters
+  function applyFiltersAndSearch() {
+      const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+      const courseCards = document.querySelectorAll('.course-card-lg');
+      let visibleCount = 0;
+      
+      console.log('Applying filter:', currentFilter, 'Search:', searchTerm);
+
+      courseCards.forEach(card => {
+          try {
+              const title = card.querySelector('.course-title').innerText.toLowerCase();
+              const courseType = getCourseType(card);
+              
+              // Check search match
+              const matchesSearch = !searchTerm || title.includes(searchTerm);
+              
+              // Check filter match
+              const matchesFilter = (currentFilter === 'all') || (courseType === currentFilter);
+              
+              console.log(`Card: "${title.substring(0, 20)}..." | Type: ${courseType} | Filter OK: ${matchesFilter} | Search OK: ${matchesSearch}`);
+              
+              // Show card if both conditions match
+              if (matchesSearch && matchesFilter) {
+                  card.style.display = 'flex';
+                  card.style.animation = 'fadeIn 0.3s ease';
+                  visibleCount++;
+              } else {
+                  card.style.display = 'none';
+              }
+          } catch(e) {
+              console.error('Error processing card:', e);
+          }
+      });
+
+      console.log('Visible courses:', visibleCount);
+
+      // Show empty message if no courses match
+      const existingEmpty = coursesGrid.querySelector('.empty-message');
+      if (visibleCount === 0) {
+          if (!existingEmpty) {
+              const emptyDiv = document.createElement('div');
+              emptyDiv.className = 'empty-message';
+              emptyDiv.innerHTML = '<h3>No courses found.</h3><p>Try adjusting your search or filters!</p>';
+              coursesGrid.appendChild(emptyDiv);
+          } else {
+              existingEmpty.style.display = 'block';
+          }
+      } else {
+          if (existingEmpty) existingEmpty.style.display = 'none';
+      }
+  }
+
+  // Initialize search functionality
+  if (searchInput) {
+      console.log('Search input found');
+      searchInput.addEventListener('input', applyFiltersAndSearch);
+      
+      searchInput.addEventListener('focus', function() {
+          this.parentElement.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.1)';
+      });
+      
+      searchInput.addEventListener('blur', function() {
+          this.parentElement.style.boxShadow = 'none';
+      });
+  } else {
+      console.warn('Search input not found');
+  }
+
+  // Initialize filter tabs
+  if (filterTabs.length > 0) {
+      console.log('Found', filterTabs.length, 'filter tabs');
+      
+      filterTabs.forEach((tab, index) => {
+          const filterValue = tab.getAttribute('data-filter');
+          console.log(`Tab ${index}: data-filter="${filterValue}"`);
+          
+          tab.addEventListener('click', function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              
+              console.log('✓ Filter tab clicked:', filterValue);
+              
+              // Remove active class from all tabs
+              filterTabs.forEach(t => {
+                  t.classList.remove('active');
+              });
+              
+              // Add active class to clicked tab
+              this.classList.add('active');
+              
+              // Update current filter
+              currentFilter = filterValue;
+              console.log('✓ Current filter updated to:', currentFilter);
+              
+              // Apply filters and search
+              applyFiltersAndSearch();
+          });
+      });
+  } else {
+      console.warn('No filter tabs found');
+  }
+
+  // Add CSS animation for elements if not already present
+  if (!document.getElementById('filterAnimations')) {
+      const style = document.createElement('style');
+      style.id = 'filterAnimations';
+      style.innerHTML = `
+          @keyframes fadeIn {
+              from { opacity: 0; transform: translateY(10px); }
+              to { opacity: 1; transform: translateY(0); }
+          }
+          .filter-tab {
+              transition: all 0.3s ease !important;
+          }
+          .search-box {
+              transition: box-shadow 0.3s ease !important;
+          }
+      `;
+      document.head.appendChild(style);
+      console.log('✓ Added filter animations');
+  }
+  
+  console.log('✓ Filter initialization complete');
+  
+  // --- EXISTING MODAL & UI LOGIC ---
+
+  // AI Result Modal Logic
+  const aiModal = document.getElementById('aiResultModal');
+  
+  // FIX: Assign the Django variable to a JS string safely.
+  const conversionResult = `{{ conversion_result|default:""|escapejs }}`;
+
+  // If we have a result text, show the modal
+  if (conversionResult.trim().length > 0) {
+      aiModal.style.display = 'flex';
+  }
+
+  function closeAiModal() {
+      aiModal.style.display = 'none';
+  }
+
+  // Logout Logic
+  const logoutLink = document.querySelector(".logout-container .nav-item");
+  const modal = document.getElementById("logout-modal");
+  const confirmBtn = document.getElementById("confirm-logout");
+  const cancelBtn = document.getElementById("cancel-logout");
+
+  if(logoutLink){
+      logoutLink.addEventListener("click", function(event) {
+        event.preventDefault();
+        modal.style.display = "flex";
+      });
+  }
+
+  if(confirmBtn){
+      confirmBtn.addEventListener("click", function() {
+        window.location.href = logoutLink.getAttribute("href");
+      });
+  }
+
+  if(cancelBtn){
+      cancelBtn.addEventListener("click", function() {
+        modal.style.display = "none";
+      });
+  }
+
+  // File Upload Display Script
+  const fileInput = document.getElementById('student-upload');
+  const fileNameDisplay = document.getElementById('file-name-display');
+  const selectBox = document.querySelector('.converter-select');
+
+  if(fileInput) {
+      fileInput.addEventListener('change', function() {
+          if (this.files && this.files[0]) {
+              fileNameDisplay.textContent = this.files[0].name;
+              selectBox.value = ""; 
+          }
+      });
+  }
+
+  if(selectBox) {
+      selectBox.addEventListener('change', function() {
+          if(this.value) {
+              fileInput.value = ""; 
+              fileNameDisplay.textContent = "";
+          }
+      });
+  }
+  
+  // Progress Bar Animation Logic
+  const convertForm = document.getElementById('convertForm');
+  const progressDiv = document.getElementById('conversion-progress');
+  const pBarFill = document.getElementById('p-bar-fill');
+  const pText = document.getElementById('p-text');
+
+  if(convertForm) {
+      convertForm.addEventListener('submit', function() {
+          const btn = this.querySelector('.btn-convert');
+          btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Converting...';
+          btn.style.opacity = '0.7';
+          
+          // Show and animate progress bar
+          progressDiv.style.display = 'block';
+          let width = 0;
+          const interval = setInterval(function() {
+              if (width >= 90) {
+                  clearInterval(interval);
+              } else {
+                  width++;
+                  pBarFill.style.width = width + '%';
+                  if(width < 30) pText.innerText = "Uploading & Analyzing content...";
+                  else if(width < 60) pText.innerText = "AI Generating Script/Notes...";
+                  else pText.innerText = "Finalizing Output & Audio...";
+              }
+          }, 300); // Slower animation to match server wait time
+      });
+  }
+});
+</script>
+
+</body>
+</html>
